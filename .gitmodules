@@ -4,3 +4,6 @@
 [submodule "sw-api"]
 	path = sw-api
 	url = https://github.com/commnerd/sw-api.git
+[submodule "instance-defs/debian"]
+	path = instance-defs/debian
+	url = https://github.com/commnerd/sw-intance-debian.git
