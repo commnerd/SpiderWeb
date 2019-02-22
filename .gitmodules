@@ -1,0 +1,3 @@
+[submodule "sw-ui"]
+	path = sw-ui
+	url = https://github.com/commnerd/sw-ui.git
