@@ -7,9 +7,3 @@
 [submodule "instance-defs/debian"]
 	path = instance-defs/debian
 	url = https://github.com/commnerd/sw-intance-debian.git
-[submodule "sw-root"]
-	path = sw-root
-	url = https://github.com/commnerd/sw-root
-[submodule "sw-master"]
-	path = sw-master
-	url = https://github.com/commnerd/sw-master
