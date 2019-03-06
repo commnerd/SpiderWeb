@@ -5,5 +5,6 @@ import (
 )
 
 func main() {
-	node.NewNode().Execute()
+	n := node.NewNode()
+	n.Execute()
 }

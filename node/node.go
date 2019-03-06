@@ -10,23 +10,24 @@ import (
 type Node struct {
 	id string            `json:"id"`
 	role string          `json:"role"`
-	registry []Node 	 `json:"registry"`
+	registry []*Node 	 `json:"registry"`
 	version string       `json:"version"`    
-    api *api.Api         `json:"api"`
-    instances []Instance `json:"instance"`
-    volumes []Volume     `json:"volumes"`
+    api *Api             `json:"api"`
+    instances []*Instance `json:"instance"`
+    volumes []*Volume     `json:"volumes"`
 }
 
 func NewNode() Node {
 	node := Node {
         id: uuid.New().String(),
        	role: "init",
-       	registry: make([]Node)
+       	registry:make([]*Node, 256),
         version: "0.0.1",
-        api: &Api{},
-        instances: []Instance{},
-        volumes: []Volume{},
+        api: new(Api),
+        instances: make([]*Instance, 1),
+        volumes: make([]*Volume, 1),
     }
+    node.api = InitApi(&node)
 
     return node
 }
@@ -38,7 +39,8 @@ func (this *Node) Execute() {
 
 func (this *Node) Register() {
 	if this.role == "root" {
-        publicNodes = append(publicNodes, this)
+        registry := this.registry
+        this.registry = append(registry, this)
         return 
     }
 
