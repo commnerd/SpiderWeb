@@ -1,7 +1,7 @@
 package node
 
 type Volume struct {
-    id string            `json:"id"`
-    name string          `json:"name"`
-    image string         `json:"image"`
+    Id string            `json:"id"`
+    Name string          `json:"name"`
+    Image string         `json:"image"`
 }

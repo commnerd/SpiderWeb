@@ -5,7 +5,7 @@ import (
 )
 
 type Route struct {
-	path string
-	methods []string
-	handler func(w http.ResponseWriter, request *http.Request)
+	Path string
+	Methods []string
+	Handler func(w http.ResponseWriter, request *http.Request)
 }

@@ -14,18 +14,18 @@ import (
 type Api struct {
 	node *Node
 	router *mux.Router
-    domain string       `json:"domain"`
-    basePath string     `json:"base_path"`
-    hostPort string     `json:"host_port"`
+    Domain string       `json:"domain"`
+    BasePath string     `json:"base_path"`
+    HostPort string     `json:"host_port"`
 }
 
 func InitApi(node *Node) *Api {
 	api := Api{
 		node: node,
 		router: mux.NewRouter(),
-		domain: "localhost",
-		basePath: "/",
-		hostPort: env["API_PORT"],
+		Domain: "localhost",
+		BasePath: "/",
+		HostPort: env["API_PORT"],
 	}
 	return &api
 }
@@ -37,7 +37,7 @@ func (this *Api) Listen() {
 	this.HandleFunc("/node", this.WhoYou)
 	this.HandleFunc("/ports/next", this.NextPort)
 
-    log.Fatal(http.ListenAndServe(":"+this.hostPort, this.router))
+    log.Fatal(http.ListenAndServe(":"+this.HostPort, this.router))
 }
 
 func (this *Api) HandleFunc(path string, f func(http.ResponseWriter, *http.Request)) {
@@ -55,7 +55,7 @@ func (this *Api) Welcome(w http.ResponseWriter, request *http.Request) {
 }
 
 func (this *Api) WhoYou(w http.ResponseWriter, request *http.Request) {
-	e, _ := json.Marshal(this.node.id)
+	e, _ := json.Marshal(this.node)
     fmt.Fprintf(w, string(e))
 }
 
