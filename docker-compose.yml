@@ -1,0 +1,8 @@
+version: "2"
+services:
+  root:
+    build: .
+    environment:
+      - HOST_ROLE=root
+  host:
+    build: .

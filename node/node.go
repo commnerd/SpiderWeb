@@ -11,7 +11,7 @@ type Node struct {
 	id string            `json:"id"`
 	role string          `json:"role"`
 	registry []*Node 	 `json:"registry"`
-	version string       `json:"version"`    
+	version string       `json:"version"`
     api *Api             `json:"api"`
     instances []*Instance `json:"instance"`
     volumes []*Volume     `json:"volumes"`
@@ -41,10 +41,10 @@ func (this *Node) Register() {
 	if this.role == "root" {
         registry := this.registry
         this.registry = append(registry, this)
-        return 
+        return
     }
 
-    resp, err := http.Get("http://"+env["ROOT_ADDR"]+"/register")
+    resp, err := http.Get("http://"+env["ROOT_NODE_URL"]+"/register")
     if err != nil {
         log.Fatalln(err)
     }
