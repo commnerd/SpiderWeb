@@ -2,6 +2,7 @@ package node
 
 import (
 	"github.com/joho/godotenv"
+	"os"
 )
 
 var env map[string]string
@@ -17,10 +18,13 @@ var defaultEnv = map[string]string {
 
 func initEnv() {
 	_ = godotenv.Load(".env")
-	var env map[string]string = defaultEnv
+	env = defaultEnv
 	overrides, _ := godotenv.Read()
-	for k, v := range(env) {
+	for k, _ := range(env) {
 		if val, ok := overrides[k]; ok {
+			env[k] = val
+		}
+		if val := os.Getenv(k); val != "" {
 			env[k] = val
 		}
 	}

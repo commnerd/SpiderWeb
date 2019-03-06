@@ -5,6 +5,8 @@ import (
     "io/ioutil"
 	"net/http"
 	"log"
+    "fmt"
+    "os"
 )
 
 type Node struct {
@@ -22,9 +24,9 @@ func NewNode() Node {
     initEnv()
     
 	node := Node {
-        environment: "production",
+        environment: env["ENVIRONMENT"],
         id: uuid.New().String(),
-       	role: "init",
+       	role: env["NODE_ROLE"],
        	registry:make([]*Node, 256),
         version: "0.0.1",
         api: new(Api),
@@ -32,8 +34,6 @@ func NewNode() Node {
         volumes: make([]*Volume, 1),
     }
 
-    node.environment = env["ENVIRONMENT"]
-    node.role = env["NODE_ROLE"]
     node.api = InitApi(&node)
 
     return node
@@ -50,6 +50,8 @@ func (this *Node) Register() {
         this.registry = append(registry, this)
         return
     }
+    fmt.Println(this.role)
+    os.Exit(1)
 
     resp, err := http.Get("http://"+env["ROOT_NODE_URL"]+"/register")
     if err != nil {
