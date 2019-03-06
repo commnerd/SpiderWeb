@@ -8,6 +8,7 @@ import (
 )
 
 type Node struct {
+    environment string   `json:"environment"`
 	id string            `json:"id"`
 	role string          `json:"role"`
 	registry []*Node 	 `json:"registry"`
@@ -18,7 +19,10 @@ type Node struct {
 }
 
 func NewNode() Node {
+    initEnv()
+    
 	node := Node {
+        environment: "production",
         id: uuid.New().String(),
        	role: "init",
        	registry:make([]*Node, 256),
@@ -27,6 +31,9 @@ func NewNode() Node {
         instances: make([]*Instance, 1),
         volumes: make([]*Volume, 1),
     }
+
+    node.environment = env["ENVIRONMENT"]
+    node.role = env["NODE_ROLE"]
     node.api = InitApi(&node)
 
     return node
