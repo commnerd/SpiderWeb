@@ -5,6 +5,6 @@ services:
     ports:
       - 93:80
     environment:
-      - HOST_ROLE=root
+      - NODE_ROLE=root
   host:
     build: .

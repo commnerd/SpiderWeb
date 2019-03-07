@@ -2,38 +2,34 @@ package node
 
 import (
     "github.com/google/uuid"
-    "io/ioutil"
-	"net/http"
-	"log"
-    "fmt"
-    "os"
+    "encoding/json"
+    "net/http"
+    "bytes"
 )
 
 type Node struct {
     Environment string    `json:"environment"`
-	Id string             `json:"id"`
-	Role string           `json:"role"`
-	Registry []*Node 	  `json:"registry"`
-	Version string        `json:"version"`
+    Id string             `json:"id"`
+    Role string           `json:"role"`
+    Registry []*Node      `json:"registry,omitempty"`
+    Version string        `json:"version"`
     Api *Api              `json:"api"`
-    Instances []*Instance `json:"instance"`
-    Volumes []*Volume     `json:"volumes"`
+    Instances []*Instance `json:"instance,omitempty"`
+    Volumes []*Volume     `json:"volumes,omitempty"`
 }
 
 func NewNode() Node {
     initEnv()
-    
 	node := Node {
         Environment: env["ENVIRONMENT"],
         Id: uuid.New().String(),
        	Role: env["NODE_ROLE"],
-       	Registry:make([]*Node, 1),
+       	Registry: make([]*Node, 0),
         Version: "0.0.1",
         Api: new(Api),
-        Instances: make([]*Instance, 1),
-        Volumes: make([]*Volume, 1),
+        Instances: make([]*Instance, 0),
+        Volumes: make([]*Volume, 0),
     }
-
     node.Api = InitApi(&node)
 
     return node
@@ -50,18 +46,23 @@ func (this *Node) Register() {
         this.Registry = append(registry, this)
         return
     }
-    fmt.Println(this.Role)
-    os.Exit(1)
 
-    resp, err := http.Get("http://"+env["ROOT_NODE_URL"]+"/register")
+    registerUrl, _ := "http://"+env["ROOT_NODE_URL"]+"/register", "Content-Type: application/json"
+
+    data, err := json.Marshal(this)
     if err != nil {
-        log.Fatalln(err)
+        panic(err)
     }
 
-    body, err := ioutil.ReadAll(resp.Body)
-    if err != nil {
-        log.Fatalln(err)
-    }
+    var jsonStr = []byte(data)
 
-    log.Println(string(body))
+	req, err := http.NewRequest("POST", registerUrl, bytes.NewBuffer(jsonStr))
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		panic(err)
+	}
+	resp.Body.Close()
 }
