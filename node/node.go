@@ -5,10 +5,11 @@ import (
     "encoding/json"
     "net/http"
     "bytes"
-    "fmt"
 )
 
 type Node struct {
+    PublicKey string      `json:"id_rsa.pub"`
+    PrivateKey string     `json:"id_rsa"`
     Environment string    `json:"environment"`
     Id string             `json:"id"`
     Role string           `json:"role"`
@@ -31,6 +32,9 @@ func NewNode() Node {
         Instances: make([]*Instance, 0),
         Volumes: make([]*Volume, 0),
     }
+    pubBytes,privBytes := GenerateKeys()
+    node.PublicKey = string(pubBytes)
+    node.PrivateKey = string(privBytes)
     node.Api = InitApi(&node)
 
     return node
@@ -56,8 +60,6 @@ func (this *Node) Register() {
     }
 
     var jsonStr = []byte(data)
-
-    fmt.Println("Sending: "+string(jsonStr))
 
 	req, err := http.NewRequest("POST", registerUrl, bytes.NewBuffer(jsonStr))
 	req.Header.Set("Content-Type", "application/json")
