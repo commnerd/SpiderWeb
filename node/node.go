@@ -5,6 +5,7 @@ import (
     "encoding/json"
     "net/http"
     "bytes"
+    "fmt"
 )
 
 type Node struct {
@@ -55,6 +56,8 @@ func (this *Node) Register() {
     }
 
     var jsonStr = []byte(data)
+
+    fmt.Println("Sending: "+string(jsonStr))
 
 	req, err := http.NewRequest("POST", registerUrl, bytes.NewBuffer(jsonStr))
 	req.Header.Set("Content-Type", "application/json")

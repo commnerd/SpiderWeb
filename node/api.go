@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
+	"io/ioutil"
 	"log"
 	"fmt"
 	// "os"
@@ -61,14 +62,29 @@ func (this *Api) Node(w http.ResponseWriter, request *http.Request) {
 }
 
 func (this *Api) Register(w http.ResponseWriter, request *http.Request) {
-	var node Node
-	request.ParseForm()
-	for key,_ := range request.Form {
-		err := json.Unmarshal([]byte(key), &node)
-		if err != nil {
-			log.Println(err.Error())
-		}
+	// Read body
+	b, err := ioutil.ReadAll(request.Body)
+	defer request.Body.Close()
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
 	}
+
+	// Unmarshal
+	var node Node
+	err = json.Unmarshal(b, &node)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	output, err := json.Marshal(this)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	w.Header().Set("content-type", "application/json")
+	w.Write(output)
 	this.node.Registry = append(this.node.Registry, &node)
 }
 
