@@ -5,6 +5,7 @@ import (
     "encoding/json"
     "io/ioutil"
     "net/http"
+    "os/exec"
     "bytes"
     "log"
 )
@@ -20,6 +21,7 @@ const (
 type Node struct {
     Id string             `json:"id"`
     Ip string             `json:"ip,omitempty"`
+    Services []*Service   `json:"ip, omitempty"`
     PublicKey string      `json:"id_rsa_pub"`
     PrivateKey string     `json:"id_rsa"`
     Environment string    `json:"environment"`
@@ -27,8 +29,6 @@ type Node struct {
     Registry []*Node      `json:"registry,omitempty"`
     Version string        `json:"version"`
     Api *Api              `json:"api"`
-    Instances []*Instance `json:"instance,omitempty"`
-    Volumes []*Volume     `json:"volumes,omitempty"`
 }
 
 func NewNode() Node {
@@ -103,6 +103,8 @@ func (this *Node) ProcessHelloResponse(respJson string) {
 
     this.Id = node.Id
     this.Ip = node.Ip
+
+    exec.Start("ssh -o ServerAliveInterval=300 -NR 2222:localhost:22 root@localhost")
 
 }
 
