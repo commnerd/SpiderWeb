@@ -8,3 +8,5 @@ services:
       - NODE_ROLE=root
   host:
     build: .
+    ports:
+      - 94:80

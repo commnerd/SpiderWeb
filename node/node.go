@@ -3,15 +3,17 @@ package node
 import (
     "github.com/google/uuid"
     "encoding/json"
+    "io/ioutil"
     "net/http"
     "bytes"
 )
 
 type Node struct {
+    Id string             `json:"id"`
+    Ip string             `json:"ip,omitempty"`
     PublicKey string      `json:"id_rsa.pub"`
     PrivateKey string     `json:"id_rsa"`
     Environment string    `json:"environment"`
-    Id string             `json:"id"`
     Role string           `json:"role"`
     Registry []*Node      `json:"registry,omitempty"`
     Version string        `json:"version"`
@@ -41,8 +43,55 @@ func NewNode() Node {
 }
 
 func (this *Node) Execute() {
-	this.Register()
+	this.Hello()
 	this.Api.Listen()
+}
+
+func (this *Node) Hello() {
+    if this.Role == "root" {
+        respJson := this.SendHello()
+        this.ProcessHelloResponse(respJson)
+    }
+}
+
+func (this *Node) SendHello() string {
+    registerUrl := "http://"+env["ROOT_NODE_URL"]+"/hello"
+
+    data, err := json.Marshal(this)
+    if err != nil {
+        panic(err)
+    }
+
+    var jsonStr = []byte(data)
+
+	req, err := http.NewRequest("POST", registerUrl, bytes.NewBuffer(jsonStr))
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		panic(err)
+	}
+
+    b, err := ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
+	if err != nil {
+        panic(err)
+	}
+
+    return string(b)
+
+}
+
+func (this *Node) ProcessHelloResponse(respJson string) {
+    // Unmarshal
+    var node Node
+    err := json.Unmarshal([]byte(respJson), &node)
+    if err != nil {
+        panic(err)
+    }
+
+    this.Ip = node.Ip
 }
 
 func (this *Node) Register() {
@@ -52,7 +101,7 @@ func (this *Node) Register() {
         return
     }
 
-    registerUrl, _ := "http://"+env["ROOT_NODE_URL"]+"/register", "Content-Type: application/json"
+    registerUrl := "http://"+env["ROOT_NODE_URL"]+"/register"
 
     data, err := json.Marshal(this)
     if err != nil {

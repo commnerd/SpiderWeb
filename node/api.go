@@ -33,6 +33,7 @@ func InitApi(node *Node) *Api {
 
 func (this *Api) Listen() {
 	this.HandleFunc("/", this.Welcome)
+	this.HandleFunc("/hello", this.Hello)
 	this.HandleFunc("/env", this.Env)
 	this.HandleFunc("/register", this.Register)
 	this.HandleFunc("/node", this.Node)
@@ -50,6 +51,33 @@ func (this *Api) Env(w http.ResponseWriter, request *http.Request) {
 	for k,v := range(env) {
 		fmt.Fprintf(w, k + ": " + v + "\n")
 	}
+}
+func (this *Api) Hello(w http.ResponseWriter, request *http.Request) {
+	// Read body
+	b, err := ioutil.ReadAll(request.Body)
+	defer request.Body.Close()
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	// Unmarshal
+	var node Node
+	err = json.Unmarshal(b, &node)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	node.Ip = request.RemoteAddr
+
+	output, err := json.Marshal(node)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(output)
 }
 
 func (this *Api) Welcome(w http.ResponseWriter, request *http.Request) {
