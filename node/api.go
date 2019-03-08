@@ -4,12 +4,11 @@ import (
 	"github.com/commnerd/sw-ports"
 	"github.com/gorilla/mux"
 	"encoding/json"
+	"io/ioutil"
 	"net/http"
 	"strconv"
-	"io/ioutil"
 	"log"
 	"fmt"
-	// "os"
 )
 
 type Api struct {
@@ -34,6 +33,7 @@ func InitApi(node *Node) *Api {
 func (this *Api) Listen() {
 	this.HandleFunc("/", this.Welcome)
 	this.HandleFunc("/hello", this.Hello)
+	this.HandleFunc("/promote_public", this.PromotePublic)
 	this.HandleFunc("/env", this.Env)
 	this.HandleFunc("/register", this.Register)
 	this.HandleFunc("/node", this.Node)
@@ -52,6 +52,7 @@ func (this *Api) Env(w http.ResponseWriter, request *http.Request) {
 		fmt.Fprintf(w, k + ": " + v + "\n")
 	}
 }
+
 func (this *Api) Hello(w http.ResponseWriter, request *http.Request) {
 	// Read body
 	b, err := ioutil.ReadAll(request.Body)
@@ -78,6 +79,8 @@ func (this *Api) Hello(w http.ResponseWriter, request *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(output)
+
+	attemptPublicConnectionPromotion(node)
 }
 
 func (this *Api) Welcome(w http.ResponseWriter, request *http.Request) {
@@ -87,6 +90,10 @@ func (this *Api) Welcome(w http.ResponseWriter, request *http.Request) {
 func (this *Api) Node(w http.ResponseWriter, request *http.Request) {
 	e, _ := json.Marshal(this.node)
     fmt.Fprintf(w, string(e))
+}
+
+func (this *Api) PromotePublic(w http.ResponseWriter, request *http.Request) {
+	this.node.PromotePublic()
 }
 
 func (this *Api) Register(w http.ResponseWriter, request *http.Request) {
@@ -118,4 +125,18 @@ func (this *Api) Register(w http.ResponseWriter, request *http.Request) {
 
 func (this *Api) NextPort(w http.ResponseWriter, request *http.Request) {
         fmt.Fprintf(w, strconv.Itoa(ports.NextAvailPort()))
+}
+
+func attemptPublicConnectionPromotion(node Node) {
+	responseUrl := "http://"+node.Ip+":"+node.Api.BasePath+"/promote_public"
+
+    tr := http.Transport{
+    	IdleConnTimeout: 0,
+    }
+
+    client := http.Client{
+    	Transport: &tr,
+    }
+
+    client.Get(responseUrl)
 }

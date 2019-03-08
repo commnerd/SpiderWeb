@@ -1,10 +1,10 @@
 FROM alpine
 
-ENV HOST_ROLE=node
+ENV NODE_ROLE=node
 
 COPY sw-node /
 COPY .env.example /.env
-RUN apk add openssh openssh-server supervisor
+RUN apk add supervisor openssh openssh-server docker
 
 RUN mkdir -p /var/log/supervisor
 ADD configs/supervisor/supervisord.conf /etc/supervisor/

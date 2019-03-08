@@ -10,3 +10,5 @@ services:
     build: .
     ports:
       - 94:80
+    depends_on:
+      - root

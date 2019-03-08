@@ -6,12 +6,21 @@ import (
     "io/ioutil"
     "net/http"
     "bytes"
+    "log"
+)
+
+const (
+    NODE_ROLE_ROOT = "root"
+    NODE_ROLE_REGISTRY = "registry"
+    NODE_ROLE_VOLUME = "volume"
+    NODE_ROLE_INSTANCE = "instance"
+    NODE_ROLE_NODE = "node"
 )
 
 type Node struct {
     Id string             `json:"id"`
     Ip string             `json:"ip,omitempty"`
-    PublicKey string      `json:"id_rsa.pub"`
+    PublicKey string      `json:"id_rsa_pub"`
     PrivateKey string     `json:"id_rsa"`
     Environment string    `json:"environment"`
     Role string           `json:"role"`
@@ -43,15 +52,15 @@ func NewNode() Node {
 }
 
 func (this *Node) Execute() {
-	this.Hello()
+    if this.Role != NODE_ROLE_ROOT {
+	   this.Hello()
+    }
 	this.Api.Listen()
 }
 
-func (this *Node) Hello() {
-    if this.Role == "root" {
-        respJson := this.SendHello()
-        this.ProcessHelloResponse(respJson)
-    }
+func (this *Node) Hello() {    
+    respJson := this.SendHello()
+    this.ProcessHelloResponse(respJson)
 }
 
 func (this *Node) SendHello() string {
@@ -70,6 +79,7 @@ func (this *Node) SendHello() string {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
+        log.Fatal(err)
 		panic(err)
 	}
 
@@ -91,11 +101,17 @@ func (this *Node) ProcessHelloResponse(respJson string) {
         panic(err)
     }
 
+    this.Id = node.Id
     this.Ip = node.Ip
+
+}
+
+func (this *Node) PromotePublic() {
+    this.Role = "registry"
 }
 
 func (this *Node) Register() {
-	if this.Role == "root" {
+	if this.Role == NODE_ROLE_ROOT {
         registry := this.Registry
         this.Registry = append(registry, this)
         return
