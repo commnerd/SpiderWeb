@@ -21,7 +21,7 @@ const (
 type Node struct {
     Id string             `json:"id"`
     Ip string             `json:"ip,omitempty"`
-    Services []*Service   `json:"ip, omitempty"`
+    Services []*struct{}  `json:"services, omitempty"`
     PublicKey string      `json:"id_rsa_pub"`
     PrivateKey string     `json:"id_rsa"`
     Environment string    `json:"environment"`
