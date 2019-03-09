@@ -23,7 +23,7 @@ type Node struct {
     Ip string                       `json:"ip,omitempty"`
     HostNode *Node                  `json:"host, omitempty"`
     Api *Api                        `json:"api"`
-    Services map[string][]*Service  `json:"services, omitempty"`
+    Services map[string][]Service  `json:"services, omitempty"`
     PublicKey string                `json:"id_rsa_pub"`
     PrivateKey string               `json:"id_rsa"`
     Role string                     `json:"role"`
@@ -35,7 +35,7 @@ func NewNode() Node {
     initEnv()
 	node := Node {
         Id: uuid.New().String(),
-        Services: make(map[string][]*Service, 0),
+        Services: make(map[string][]Service, 0),
        	Role: env["NODE_ROLE"],
        	Registry: make([]*Node, 0),
         Version: "0.0.1",
@@ -45,6 +45,7 @@ func NewNode() Node {
     node.PrivateKey = string(privBytes)
     node.Api = InitApi(&node)
 
+    /*
     for _, array := range(node.Services) {
         for _, servicePointer := range(array) {
             go func() {
@@ -53,6 +54,7 @@ func NewNode() Node {
             }()
         }
     }
+    */
 
     return node
 }
@@ -117,7 +119,8 @@ func (this *Node) ProcessHelloResponse(respJson string) {
     }
 
     tunnel := NewTunnel(this)
-    go tunnel.Run()
+    this.Services["tunnels"] = append(this.Services["tunnels"], tunnel)
+    tunnel.Run()
 }
 
 func (this *Node) PromotePublic() {
