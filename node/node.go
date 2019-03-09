@@ -7,6 +7,7 @@ import (
     "net/http"
     "bytes"
     "log"
+    "fmt"
 )
 
 const (
@@ -103,6 +104,7 @@ func (this *Node) ProcessHelloResponse(respJson string) {
     var node Node
     err := json.Unmarshal([]byte(respJson), &node)
     if err != nil {
+        fmt.Println(respJson)
         panic(err)
     }
 

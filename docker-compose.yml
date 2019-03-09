@@ -1,20 +1,25 @@
 version: "2"
 services:
   root:
-    build: .
+    build:
+      context: .
     volumes:
       - .:/node
+      - ./configs/supervisor/conf.d:/etc/supervisor/conf.d
     ports:
       - 93:80
     environment:
       - NODE_ROLE=root
     command: /node/sw-node
   host:
-    build: .
+    image: spiderweb_root
     volumes:
       - .:/node
+      - ./configs/supervisor/conf.d:/etc/supervisor/conf.d
     ports:
       - 94:80
+    environment:
+      - ROOT_NODE_URL=root:80
     depends_on:
       - root
     command: /node/sw-node
