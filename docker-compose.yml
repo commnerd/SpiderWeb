@@ -2,13 +2,19 @@ version: "2"
 services:
   root:
     build: .
+    volumes:
+      - .:/node
     ports:
       - 93:80
     environment:
       - NODE_ROLE=root
+    command: /node/sw-node
   host:
     build: .
+    volumes:
+      - .:/node
     ports:
       - 94:80
     depends_on:
       - root
+    command: /node/sw-node

@@ -5,7 +5,6 @@ import (
     "encoding/json"
     "io/ioutil"
     "net/http"
-    "os/exec"
     "bytes"
     "log"
 )
@@ -19,34 +18,40 @@ const (
 )
 
 type Node struct {
-    Id string             `json:"id"`
-    Ip string             `json:"ip,omitempty"`
-    Services []*struct{}  `json:"services, omitempty"`
-    PublicKey string      `json:"id_rsa_pub"`
-    PrivateKey string     `json:"id_rsa"`
-    Environment string    `json:"environment"`
-    Role string           `json:"role"`
-    Registry []*Node      `json:"registry,omitempty"`
-    Version string        `json:"version"`
-    Api *Api              `json:"api"`
+    Id string                       `json:"id"`
+    Ip string                       `json:"ip,omitempty"`
+    HostNode *Node                  `json:"host, omitempty"`
+    Api *Api                        `json:"api"`
+    Services map[string][]*Service  `json:"services, omitempty"`
+    PublicKey string                `json:"id_rsa_pub"`
+    PrivateKey string               `json:"id_rsa"`
+    Role string                     `json:"role"`
+    Registry []*Node                `json:"registry,omitempty"`
+    Version string                  `json:"version"`
 }
 
 func NewNode() Node {
     initEnv()
 	node := Node {
-        Environment: env["ENVIRONMENT"],
         Id: uuid.New().String(),
+        Services: make(map[string][]*Service, 0),
        	Role: env["NODE_ROLE"],
        	Registry: make([]*Node, 0),
         Version: "0.0.1",
-        Api: new(Api),
-        Instances: make([]*Instance, 0),
-        Volumes: make([]*Volume, 0),
     }
     pubBytes,privBytes := GenerateKeys()
     node.PublicKey = string(pubBytes)
     node.PrivateKey = string(privBytes)
     node.Api = InitApi(&node)
+
+    for _, array := range(node.Services) {
+        for _, servicePointer := range(array) {
+            go func() {
+                service := *servicePointer
+                service.Run()
+            }()
+        }
+    }
 
     return node
 }
@@ -55,10 +60,10 @@ func (this *Node) Execute() {
     if this.Role != NODE_ROLE_ROOT {
 	   this.Hello()
     }
-	this.Api.Listen()
+	this.Api.Run()
 }
 
-func (this *Node) Hello() {    
+func (this *Node) Hello() {
     respJson := this.SendHello()
     this.ProcessHelloResponse(respJson)
 }
@@ -103,9 +108,14 @@ func (this *Node) ProcessHelloResponse(respJson string) {
 
     this.Id = node.Id
     this.Ip = node.Ip
+    if this.HostNode != node.HostNode {
+        this.HostNode = node.HostNode
+        this.Hello()
+        return
+    }
 
-    exec.Start("ssh -o ServerAliveInterval=300 -NR 2222:localhost:22 root@localhost")
-
+    tunnel := NewTunnel(this)
+    go tunnel.Run()
 }
 
 func (this *Node) PromotePublic() {

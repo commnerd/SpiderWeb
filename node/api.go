@@ -30,7 +30,7 @@ func InitApi(node *Node) *Api {
 	return &api
 }
 
-func (this *Api) Listen() {
+func (this *Api) Run() {
 	this.HandleFunc("/", this.Welcome)
 	this.HandleFunc("/hello", this.Hello)
 	this.HandleFunc("/promote_public", this.PromotePublic)
