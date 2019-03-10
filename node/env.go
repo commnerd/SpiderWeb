@@ -8,11 +8,9 @@ import (
 var env map[string]string
 
 var defaultEnv = map[string]string {
-	"ENVIRONMENT": "production",
 	"NODE_ROLE": "node",
-	"ROOT_NODE_URL": "spiderweb.com:80",
+	"ROOT_ADDR": "spiderweb.com",
 	"API_PORT": "80",
-	"SERVICE_PORT": "22",
 	"API_BASE_PATH": "/",
 }
 

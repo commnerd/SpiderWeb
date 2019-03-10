@@ -20,10 +20,10 @@ const (
 
 type Node struct {
     Id string                       `json:"id"`
-    Ip string                       `json:"ip,omitempty"`
+    Addr string                     `json:"address,omitempty"`
     HostNode *Node                  `json:"host, omitempty"`
     Api *Api                        `json:"api"`
-    Services map[string][]Service  `json:"services, omitempty"`
+    Services map[string][]Service   `json:"services, omitempty"`
     PublicKey string                `json:"id_rsa_pub"`
     PrivateKey string               `json:"id_rsa"`
     Role string                     `json:"role"`
@@ -35,6 +35,7 @@ func NewNode() Node {
     initEnv()
 	node := Node {
         Id: uuid.New().String(),
+        HostNode: &Node{Addr:env["ROOT_ADDR"],Api: &Api{HostPort: "80"}},
         Services: make(map[string][]Service, 0),
        	Role: env["NODE_ROLE"],
        	Registry: make([]*Node, 0),
@@ -45,16 +46,9 @@ func NewNode() Node {
     node.PrivateKey = string(privBytes)
     node.Api = InitApi(&node)
 
-    /*
-    for _, array := range(node.Services) {
-        for _, servicePointer := range(array) {
-            go func() {
-                service := *servicePointer
-                service.Run()
-            }()
-        }
+    if(env["NODE_ROLE"] == "root") {
+        node.Addr = "root"
     }
-    */
 
     return node
 }
@@ -72,29 +66,30 @@ func (this *Node) Hello() {
 }
 
 func (this *Node) SendHello() string {
-    registerUrl := "http://"+env["ROOT_NODE_URL"]+"/hello"
+    registerUrl := "http://"+this.HostNode.Addr+":"+this.HostNode.Api.HostPort+"/hello"
 
     data, err := json.Marshal(this)
+    fmt.Println("Me: "+string(data))
     if err != nil {
-        panic(err)
+        log.Fatalln(err)
     }
 
     var jsonStr = []byte(data)
 
+    fmt.Println("Sending 'hello' to "+registerUrl)
 	req, err := http.NewRequest("POST", registerUrl, bytes.NewBuffer(jsonStr))
 	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-        log.Fatal(err)
-		panic(err)
+        log.Fatalln(err)
 	}
 
     b, err := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
 	if err != nil {
-        panic(err)
+        log.Fatalln(err)
 	}
 
     return string(b)
@@ -106,13 +101,13 @@ func (this *Node) ProcessHelloResponse(respJson string) {
     var node Node
     err := json.Unmarshal([]byte(respJson), &node)
     if err != nil {
-        fmt.Println(respJson)
-        panic(err)
+        log.Fatalln(err)
     }
 
     this.Id = node.Id
-    this.Ip = node.Ip
-    if this.HostNode != node.HostNode {
+    this.Addr = node.Addr
+    if this.HostNode.Addr != node.HostNode.Addr {
+        fmt.Println("Trying again... "+this.HostNode.Addr+" is not "+node.HostNode.Addr)
         this.HostNode = node.HostNode
         this.Hello()
         return
@@ -120,6 +115,7 @@ func (this *Node) ProcessHelloResponse(respJson string) {
 
     tunnel := NewTunnel(this)
     this.Services["tunnels"] = append(this.Services["tunnels"], tunnel)
+    fmt.Println("Starting tunnel.")
     tunnel.Run()
 }
 
@@ -138,7 +134,7 @@ func (this *Node) Register() {
 
     data, err := json.Marshal(this)
     if err != nil {
-        panic(err)
+        log.Fatalln(err)
     }
 
     var jsonStr = []byte(data)
@@ -149,7 +145,7 @@ func (this *Node) Register() {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		panic(err)
+        log.Fatalln(err)
 	}
 	resp.Body.Close()
 }

@@ -2,6 +2,7 @@ package node
 
 import (
     "os/exec"
+    "fmt"
 )
 
 type Tunnel struct{
@@ -19,7 +20,9 @@ func NewTunnel(node *Node) *Tunnel {
 
 func (this *Tunnel) Run() {
     if this.node.HostNode != nil {
-        cmd := exec.Command("ssh", "-o ServerAliveInterval=300", "-N", "-R", this.node.HostNode.Api.HostPort+":localhost:22 root@"+this.node.HostNode.Ip)
+        fmt.Println("Starting tunnel.")
+        fmt.Println("ssh -o ServerAliveInterval=300 -N -R"+this.node.HostNode.Api.HostPort+":localhost:22 root@"+this.node.HostNode.Addr)
+        cmd := exec.Command("ssh", "-o ServerAliveInterval=300", "-N", "-R", this.node.HostNode.Api.HostPort+":localhost:22 root@"+this.node.HostNode.Addr)
         cmd.Start()
     }
 }

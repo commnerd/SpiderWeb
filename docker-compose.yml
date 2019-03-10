@@ -19,7 +19,7 @@ services:
     ports:
       - 94:80
     environment:
-      - ROOT_NODE_URL=root:80
+      - ROOT_ADDR=root
     depends_on:
       - root
     command: /node/sw-node

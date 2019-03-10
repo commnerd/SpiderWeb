@@ -39,7 +39,7 @@ func (this *Api) Run() {
 	this.HandleFunc("/node", this.Node)
 	this.HandleFunc("/ports/next", this.NextPort)
 
-	fmt.Println("Welcome to SpiderWeb!")
+	fmt.Println("Welcome to SpiderWeb on port "+this.HostPort+"!")
     log.Fatal(http.ListenAndServe(":"+this.HostPort, this.router))
 }
 
@@ -70,7 +70,8 @@ func (this *Api) Hello(w http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	node.Ip = request.RemoteAddr
+	node.Addr = request.RemoteAddr
+	node.HostNode = this.node
 
 	output, err := json.Marshal(node)
 	if err != nil {
@@ -128,7 +129,10 @@ func (this *Api) NextPort(w http.ResponseWriter, request *http.Request) {
 }
 
 func attemptPublicConnectionPromotion(node Node) {
-	responseUrl := "http://"+node.Ip+":"+node.Api.BasePath+"/promote_public"
+	addr := node.Addr
+	port := node.Api.HostPort
+	base := node.Api.BasePath
+	responseUrl := "http://"+addr+":"+port+base+"/promote_public"
 
     tr := http.Transport{
     	IdleConnTimeout: 0,
