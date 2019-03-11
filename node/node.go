@@ -6,11 +6,14 @@ import (
     "io/ioutil"
     "net/http"
     "bytes"
+    "time"
     "log"
     "fmt"
 )
 
 const (
+    VERSION = "0.0.1"
+
     NODE_ROLE_ROOT = "root"
     NODE_ROLE_REGISTRY = "registry"
     NODE_ROLE_VOLUME = "volume"
@@ -39,25 +42,28 @@ func NewNode() Node {
         Services: make(map[string][]Service, 0),
        	Role: env["NODE_ROLE"],
        	Registry: make([]*Node, 0),
-        Version: "0.0.1",
+        Version: VERSION,
     }
     pubBytes,privBytes := GenerateKeys()
     node.PublicKey = string(pubBytes)
     node.PrivateKey = string(privBytes)
     node.Api = InitApi(&node)
 
-    if(env["NODE_ROLE"] == "root") {
-        node.Addr = "root"
+    if(env["NODE_ROLE"] == NODE_ROLE_ROOT) {
+        node.Addr = NODE_ROLE_ROOT
     }
 
     return node
 }
 
 func (this *Node) Execute() {
+    go this.Api.Run()
     if this.Role != NODE_ROLE_ROOT {
 	   this.Hello()
     }
-	this.Api.Run()
+    for {
+        time.Sleep(time.Minute)
+    }
 }
 
 func (this *Node) Hello() {
@@ -121,7 +127,6 @@ func (this *Node) ProcessHelloResponse(respJson string) {
     if err != nil {
         log.Fatalln(err)
     }
-
 
     tunnel := NewTunnel(this)
     this.Services["tunnels"] = append(this.Services["tunnels"], tunnel)
