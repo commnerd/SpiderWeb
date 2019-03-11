@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
+	"net"
 	"log"
 	"fmt"
 )
@@ -33,7 +34,6 @@ func InitApi(node *Node) *Api {
 func (this *Api) Run() {
 	this.HandleFunc("/", this.Welcome)
 	this.HandleFunc("/hello", this.Hello)
-	this.HandleFunc("/promote_public", this.PromotePublic)
 	this.HandleFunc("/env", this.Env)
 	this.HandleFunc("/register", this.Register)
 	this.HandleFunc("/node", this.Node)
@@ -70,8 +70,18 @@ func (this *Api) Hello(w http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	node.Addr = request.RemoteAddr
+	ip, _, err := net.SplitHostPort(request.RemoteAddr)
+    if err != nil {
+        //return nil, fmt.Errorf("userip: %q is not IP:port", req.RemoteAddr)
+
+        log.Fatalln(w, "userip: %q is not IP:port", request.RemoteAddr)
+    }
+
+	node.Addr = ip
 	node.HostNode = this.node
+	if(isPublic(node)) {
+		node.Role = "registry"
+	}
 
 	output, err := json.Marshal(node)
 	if err != nil {
@@ -80,8 +90,6 @@ func (this *Api) Hello(w http.ResponseWriter, request *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(output)
-
-	attemptPublicConnectionPromotion(node)
 }
 
 func (this *Api) Welcome(w http.ResponseWriter, request *http.Request) {
@@ -91,10 +99,6 @@ func (this *Api) Welcome(w http.ResponseWriter, request *http.Request) {
 func (this *Api) Node(w http.ResponseWriter, request *http.Request) {
 	e, _ := json.Marshal(this.node)
     fmt.Fprintf(w, string(e))
-}
-
-func (this *Api) PromotePublic(w http.ResponseWriter, request *http.Request) {
-	this.node.PromotePublic()
 }
 
 func (this *Api) Register(w http.ResponseWriter, request *http.Request) {
@@ -128,19 +132,19 @@ func (this *Api) NextPort(w http.ResponseWriter, request *http.Request) {
         fmt.Fprintf(w, strconv.Itoa(ports.NextAvailPort()))
 }
 
-func attemptPublicConnectionPromotion(node Node) {
+func isPublic(node Node) bool {
 	addr := node.Addr
 	port := node.Api.HostPort
 	base := node.Api.BasePath
-	responseUrl := "http://"+addr+":"+port+base+"/promote_public"
+	responseUrl := "http://"+addr+":"+port+base
+	fmt.Println("Checking "+responseUrl)
+    client := http.Client{}
 
-    tr := http.Transport{
-    	IdleConnTimeout: 0,
-    }
-
-    client := http.Client{
-    	Transport: &tr,
-    }
-
-    client.Get(responseUrl)
+    _, err := client.Get(responseUrl)
+	if(err != nil) {
+		fmt.Println("Ugh...")
+		return false
+	}
+	fmt.Println("Yay!")
+	return true
 }

@@ -104,8 +104,8 @@ func (this *Node) ProcessHelloResponse(respJson string) {
         log.Fatalln(err)
     }
 
-    this.Id = node.Id
     this.Addr = node.Addr
+
     if this.HostNode.Addr != node.HostNode.Addr {
         fmt.Println("Trying again... "+this.HostNode.Addr+" is not "+node.HostNode.Addr)
         this.HostNode = node.HostNode
@@ -113,14 +113,20 @@ func (this *Node) ProcessHelloResponse(respJson string) {
         return
     }
 
+    this.HostNode = node.HostNode
+    this.Role = node.Role
+
+    data, err := json.Marshal(this)
+    fmt.Println("NewMe: "+string(data))
+    if err != nil {
+        log.Fatalln(err)
+    }
+
+
     tunnel := NewTunnel(this)
     this.Services["tunnels"] = append(this.Services["tunnels"], tunnel)
     fmt.Println("Starting tunnel.")
     tunnel.Run()
-}
-
-func (this *Node) PromotePublic() {
-    this.Role = "registry"
 }
 
 func (this *Node) Register() {
