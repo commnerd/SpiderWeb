@@ -2,6 +2,7 @@ package node
 
 import (
 	"github.com/commnerd/sw-ports"
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"encoding/json"
 	"io/ioutil"
@@ -40,7 +41,7 @@ func (this *Api) Run() {
 	this.HandleFunc("/ports/next", this.NextPort)
 
 	fmt.Println("Welcome to SpiderWeb on port "+this.HostPort+"!")
-    log.Fatal(http.ListenAndServe(":"+this.HostPort, this.router))
+	log.Fatal(http.ListenAndServe(":"+this.HostPort, handlers.CORS(handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"}), handlers.AllowedMethods([]string{"GET", "POST", "PUT", "HEAD", "OPTIONS"}), handlers.AllowedOrigins([]string{"*"}))(this.router)))
 }
 
 func (this *Api) HandleFunc(path string, f func(http.ResponseWriter, *http.Request)) {
