@@ -37,8 +37,13 @@ func (this *Api) Run() {
 	this.HandleFunc("/hello", this.Hello)
 	this.HandleFunc("/env", this.Env)
 	this.HandleFunc("/register", this.Register)
-	this.HandleFunc("/node", this.Node)
-	this.HandleFunc("/ports/next", this.NextPort)
+	this.HandleFunc("/node", this.GetNode)
+	this.HandleFunc("/node/host", this.GetHostNode)
+	this.HandleFunc("/node/api", this.GetApi)
+	// this.HandleFunc("/node/services", this.GetServices)
+	this.HandleFunc("/node/registry", this.GetRegistry)
+
+	this.HandleFunc("/ports/next", this.GetNextPort)
 
 	fmt.Println("Welcome to SpiderWeb on port "+this.HostPort+"!")
 	log.Fatal(http.ListenAndServe(":"+this.HostPort, handlers.CORS(handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"}), handlers.AllowedMethods([]string{"GET", "POST", "PUT", "HEAD", "OPTIONS"}), handlers.AllowedOrigins([]string{"*"}))(this.router)))
@@ -97,8 +102,23 @@ func (this *Api) Welcome(w http.ResponseWriter, request *http.Request) {
         fmt.Fprintf(w, "Welcome to SpiderWeb Master!")
 }
 
-func (this *Api) Node(w http.ResponseWriter, request *http.Request) {
+func (this *Api) GetNode(w http.ResponseWriter, request *http.Request) {
 	e, _ := json.Marshal(this.node)
+    fmt.Fprintf(w, string(e))
+}
+
+func (this *Api) GetHostNode(w http.ResponseWriter, request *http.Request) {
+	e, _ := json.Marshal(this.node.HostNode)
+    fmt.Fprintf(w, string(e))
+}
+
+func (this *Api) GetApi(w http.ResponseWriter, request *http.Request) {
+	e, _ := json.Marshal(this.node.Api)
+    fmt.Fprintf(w, string(e))
+}
+
+func (this *Api) GetRegistry(w http.ResponseWriter, request *http.Request) {
+	e, _ := json.Marshal(this.node.Registry)
     fmt.Fprintf(w, string(e))
 }
 
@@ -129,7 +149,7 @@ func (this *Api) Register(w http.ResponseWriter, request *http.Request) {
 	this.node.Registry = append(this.node.Registry, &node)
 }
 
-func (this *Api) NextPort(w http.ResponseWriter, request *http.Request) {
+func (this *Api) GetNextPort(w http.ResponseWriter, request *http.Request) {
         fmt.Fprintf(w, strconv.Itoa(ports.NextAvailPort()))
 }
 

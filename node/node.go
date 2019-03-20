@@ -24,14 +24,14 @@ const (
 type Node struct {
     Id string                       `json:"id"`
     Addr string                     `json:"address,omitempty"`
-    HostNode *Node                  `json:"host, omitempty"`
-    Api *Api                        `json:"api"`
-    Services map[string][]Service   `json:"services, omitempty"`
     PublicKey string                `json:"id_rsa_pub"`
     PrivateKey string               `json:"id_rsa"`
     Role string                     `json:"role"`
-    Registry []*Node                `json:"registry,omitempty"`
     Version string                  `json:"version"`
+    HostNode *Node
+    Api *Api
+    Services map[string][]Service
+    Registry []*Node
 }
 
 func NewNode() Node {
