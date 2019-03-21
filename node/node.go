@@ -1,6 +1,7 @@
 package node
 
 import (
+    "github.com/commnerd/SpiderWeb/node/services"
     "github.com/google/uuid"
     "encoding/json"
     "io/ioutil"
@@ -11,67 +12,61 @@ import (
     "fmt"
 )
 
-const (
-    VERSION = "0.0.1"
+const VERSION = "0.0.1"
 
+const (
     NODE_ROLE_ROOT = "root"
     NODE_ROLE_REGISTRY = "registry"
-    NODE_ROLE_VOLUME = "volume"
-    NODE_ROLE_INSTANCE = "instance"
     NODE_ROLE_NODE = "node"
+    NODE_ROLE_INIT = "init"
 )
 
 type Node struct {
     Id string                       `json:"id"`
+    Env map[string]string
     Addr string                     `json:"address,omitempty"`
-    PublicKey string                `json:"id_rsa_pub"`
-    PrivateKey string               `json:"id_rsa"`
+    PublicKey string
+    PrivateKey string
     Role string                     `json:"role"`
     Version string                  `json:"version"`
-    HostNode *Node
-    Api *Api
-    Services map[string][]Service
-    Registry []*Node
+    HostNode Node
+    Services []*services.Service
+    Registry []Node
 }
 
-func NewNode() Node {
-    initEnv()
+func NewNode(env map[string]string) Node {
 	node := Node {
         Id: uuid.New().String(),
-        HostNode: &Node{Addr:env["ROOT_ADDR"],Api: &Api{HostPort: "80"}},
-        Services: make(map[string][]Service, 0),
+        Env: env,
+        HostNode: Node{Addr:env["ROOT_ADDR"]},
+        Services: make([]*Service, 0),
        	Role: env["NODE_ROLE"],
-       	Registry: make([]*Node, 0),
+       	Registry: make([]Node, 0),
         Version: VERSION,
     }
     pubBytes,privBytes := GenerateKeys()
     node.PublicKey = string(pubBytes)
     node.PrivateKey = string(privBytes)
-    node.Api = InitApi(&node)
-
-    if(env["NODE_ROLE"] == NODE_ROLE_ROOT) {
-        node.Addr = NODE_ROLE_ROOT
-    }
 
     return node
 }
 
-func (this *Node) Execute() {
-    go this.Api.Run()
+func (this *Node) Run() {
+    this.services = append(this.services, services.NewApi())
     if this.Role != NODE_ROLE_ROOT {
 	   this.Hello()
     }
     for {
         time.Sleep(time.Minute)
+        for _, service := range(this.Services) {
+            if(!service.IsRunning()) {
+                go service.Run()
+            }
+        }
     }
 }
 
 func (this *Node) Hello() {
-    respJson := this.SendHello()
-    this.ProcessHelloResponse(respJson)
-}
-
-func (this *Node) SendHello() string {
     registerUrl := "http://"+this.HostNode.Addr+":"+this.HostNode.Api.HostPort+"/hello"
 
     data, err := json.Marshal(this)
@@ -80,10 +75,8 @@ func (this *Node) SendHello() string {
         log.Fatalln(err)
     }
 
-    var jsonStr = []byte(data)
-
     fmt.Println("Sending 'hello' to "+registerUrl)
-	req, err := http.NewRequest("POST", registerUrl, bytes.NewBuffer(jsonStr))
+	req, err := http.NewRequest("POST", registerUrl, bytes.NewBuffer(data))
 	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}
@@ -92,20 +85,15 @@ func (this *Node) SendHello() string {
         log.Fatalln(err)
 	}
 
-    b, err := ioutil.ReadAll(resp.Body)
+    respData, err := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
 	if err != nil {
         log.Fatalln(err)
 	}
 
-    return string(b)
-
-}
-
-func (this *Node) ProcessHelloResponse(respJson string) {
     // Unmarshal
     var node Node
-    err := json.Unmarshal([]byte(respJson), &node)
+    err = json.Unmarshal(respData, &node)
     if err != nil {
         log.Fatalln(err)
     }
@@ -122,16 +110,13 @@ func (this *Node) ProcessHelloResponse(respJson string) {
     this.HostNode = node.HostNode
     this.Role = node.Role
 
-    data, err := json.Marshal(this)
+    data, err = json.Marshal(this)
     fmt.Println("NewMe: "+string(data))
     if err != nil {
         log.Fatalln(err)
     }
 
-    tunnel := NewTunnel(this)
-    this.Services["tunnels"] = append(this.Services["tunnels"], tunnel)
-    fmt.Println("Starting tunnel.")
-    tunnel.Run()
+    this.Services = append(this.Services, services.NewTunnel(this))
 }
 
 func (this *Node) Register() {
@@ -148,9 +133,7 @@ func (this *Node) Register() {
         log.Fatalln(err)
     }
 
-    var jsonStr = []byte(data)
-
-	req, err := http.NewRequest("POST", registerUrl, bytes.NewBuffer(jsonStr))
+	req, err := http.NewRequest("POST", registerUrl, bytes.NewBuffer(data))
 	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}

@@ -1,4 +1,4 @@
-package node
+package services
 
 import (
 	"github.com/commnerd/sw-ports"
@@ -21,15 +21,17 @@ type Api struct {
     HostPort string     `json:"host_port"`
 }
 
-func InitApi(node *Node) *Api {
+func NewApi(node *Node) *Api {
 	api := Api{
 		node: node,
 		router: mux.NewRouter(),
-		Domain: "localhost",
 		BasePath: "/",
-		HostPort: env["API_PORT"],
 	}
 	return &api
+}
+
+func (this *Api) GetLabel() string {
+	return "api"
 }
 
 func (this *Api) Run() {
@@ -40,13 +42,16 @@ func (this *Api) Run() {
 	this.HandleFunc("/node", this.GetNode)
 	this.HandleFunc("/node/host", this.GetHostNode)
 	this.HandleFunc("/node/api", this.GetApi)
-	// this.HandleFunc("/node/services", this.GetServices)
 	this.HandleFunc("/node/registry", this.GetRegistry)
 
 	this.HandleFunc("/ports/next", this.GetNextPort)
 
 	fmt.Println("Welcome to SpiderWeb on port "+this.HostPort+"!")
 	log.Fatal(http.ListenAndServe(":"+this.HostPort, handlers.CORS(handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"}), handlers.AllowedMethods([]string{"GET", "POST", "PUT", "HEAD", "OPTIONS"}), handlers.AllowedOrigins([]string{"*"}))(this.router)))
+}
+
+func (this *Api) IsRunning() boolean {
+	return true
 }
 
 func (this *Api) HandleFunc(path string, f func(http.ResponseWriter, *http.Request)) {

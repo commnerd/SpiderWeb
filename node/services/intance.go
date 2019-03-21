@@ -1,4 +1,4 @@
-package node
+package services
 
 type Instance struct {
     Id string            `json:"id"`

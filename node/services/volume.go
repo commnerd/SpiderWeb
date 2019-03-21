@@ -1,4 +1,4 @@
-package node
+package services
 
 type Volume struct {
     Id string            `json:"id"`

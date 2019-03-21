@@ -1,4 +1,4 @@
-package node
+package services
 
 import (
     "os/exec"
@@ -6,16 +6,23 @@ import (
 )
 
 type Tunnel struct{
-    Service
-    node *Node
+    node *node.Node
 }
 
-func NewTunnel(node *Node) *Tunnel {
+func NewTunnel(node *node.Node) *Tunnel {
     tunnel := &Tunnel{
         node: node,
     }
 
     return tunnel
+}
+
+func (this *Tunnel) GetLabel() string {
+    return "tunnel"
+}
+
+func (this *Tunnel) IsRunning() boolean {
+    return true
 }
 
 func (this *Tunnel) Run() {

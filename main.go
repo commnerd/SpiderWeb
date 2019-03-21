@@ -5,6 +5,7 @@ import (
 )
 
 func main() {
-	n := node.NewNode()
-	n.Execute()
+	env := InitEnv()
+	n := node.NewNode(env)
+	n.Run()
 }

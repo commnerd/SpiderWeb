@@ -1,4 +1,4 @@
-package node
+package main
 
 import (
 	"github.com/joho/godotenv"
@@ -14,7 +14,7 @@ var defaultEnv = map[string]string {
 	"API_BASE_PATH": "/",
 }
 
-func initEnv() {
+func InitEnv() map[string]string {
 	_ = godotenv.Load(".env")
 	env = defaultEnv
 	overrides, _ := godotenv.Read()
@@ -26,4 +26,6 @@ func initEnv() {
 			env[k] = val
 		}
 	}
+
+	return env
 }
