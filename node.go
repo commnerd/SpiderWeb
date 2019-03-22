@@ -26,3 +26,5 @@ func (this *Node) Run() {
 	api := NewApi(this)
 	api.Run()
 }
+
+func (this *Node) RegisterService(service Service)
