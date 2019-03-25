@@ -2,10 +2,13 @@ package main
 
 import (
 	"github.com/gorilla/mux"
+	"os/signal"
 	"net/http"
+	"syscall"
 	"net"
 	"fmt"
 	"log"
+	"os"
 )
 
 type Query struct {
@@ -58,10 +61,20 @@ func (this *Api) Run() {
 		log.Fatalln(err)
 	}
 
-	err = http.Serve(l, r)
-	if err != nil {
-		log.Fatalln(err)
-	}
+	sigc := make(chan os.Signal, 1)
+	signal.Notify(sigc, os.Interrupt, os.Kill, syscall.SIGTERM)
+
+	go func(c chan os.Signal) {
+	    // Wait for a SIGINT or SIGKILL:
+	    sig := <-c
+	    log.Printf("Caught signal %s: shutting down.", sig)
+	    // Stop listening (and unlink the socket if unix type):
+	    l.Close()
+	    // And we're done:
+	    os.Exit(0)
+	}(sigc)
+
+	log.Fatalln(http.Serve(l, r))
 }
 
 
