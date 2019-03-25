@@ -7,29 +7,19 @@ const (
 	TunnelPublicKey  string = "/var/run/spider_web/keys/id_rsa.pub"
 )
 
-type Tunnel ServiceStruct
+type Tunnel Service
 
-func NewTunnel(node Node) *Tunnel {
-	return &Tunnel{ node, "tunnel", ServiceStatusInit }
-}
-
-func (this *Tunnel) GetServiceLabel() string {
-	return this.Label
-}
-
-func (this *Tunnel) GetStatus() ServiceStatus {
-	return this.Status
+func NewTunnel(node Node) Tunnel {
+	return Tunnel{ node, "tunnel", 0}
 }
 
 func (this *Tunnel) Run() {
 	go func() {
-		this.Status = ServiceStatusRunning
+		service := Service(*this)
+		commChannel := this.Node.GetCommChannel()
+		commChannel <- ServiceNotification{ service, ServiceInitialized }
 		cmd := exec.Command("ssh", "-i", TunnelPrivateKey, this.Node.GetRegistrar().GetAddress())
 		cmd.Run()
-		this.Status = ServiceStatusDead
+		commChannel <- ServiceNotification{ service, ServiceDied }
 	}()
 }
-
-
-	
-	

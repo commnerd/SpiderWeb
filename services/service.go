@@ -1,34 +1,34 @@
 package services
 
-type ServiceStatus int
+type ServiceEvent int
 
 const (
-	ServiceStatusInit ServiceStatus = iota
-	ServiceStatusRunning
-	ServiceStatusDead
-	ServiceStatusKilled
+	ServiceInitialized ServiceEvent = iota
+	ServiceRunning
+	ServiceDied
+	ServiceKilled
 )
 
-type Service interface{
-	GetServiceLabel() string
-	GetStatus() ServiceStatus
-	Run()
+type ServiceNotification struct {
+	Service Service
+	Event ServiceEvent
+}
+
+type Service struct{
+	Node Node
+	Label string
+	Index int
 }
 
 type Node interface {
 	GetRegistrar() Node
+	GetCommChannel() chan ServiceNotification
 	GetAddress() string
 	GetRole() string
-	RegisterService(Service)
-}
-
-type ServiceStruct struct{
-	Node Node
-	Label string
-	Status ServiceStatus
+	RegisterService(*Service)
 }
 
 func Bootstrap(node Node) {
-	service := NewTunnel(node)
-	node.RegisterService(service)
+	tunnel := Service(NewTunnel(node))
+	node.RegisterService(&tunnel)
 }
