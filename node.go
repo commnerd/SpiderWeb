@@ -18,7 +18,7 @@ type Node struct{
 	Address string
 	Registrar *Node
 	CommChannel chan services.ServiceNotification
-	Services []*services.Service
+	Services []services.Service
 }
 
 func NewNode() Node {
@@ -26,18 +26,21 @@ func NewNode() Node {
 		Role: NodeRoleRoot,
 		Address: "localhost",
 		CommChannel: make(chan services.ServiceNotification),
-		Services: make([]*services.Service, 0),
+		Services: make([]services.Service, 0),
 	}
 }
 
 func (this *Node) Run() {
 	services.Bootstrap(this)
 	api := NewApi(this)
+	for _, service := range(this.Services) {
+		service.Run()
+	}
 	api.Run()
 }
 
-func (this *Node) RegisterService(service *services.Service) {
-	service.Index = len(this.Services)
+func (this *Node) RegisterService(service services.Service) {
+	service.SetIndex(len(this.Services))
 	this.Services = append(this.Services, service)
 }
 
@@ -69,13 +72,13 @@ func (this *Node) monitorServices() {
 		msg := ""
 		switch notification.Event {
 		case services.ServiceInitialized:
-			msg = notification.Service.Label + " was started."
+			msg = notification.Service.GetLabel() + " was started."
 		case services.ServiceRunning:
-			msg = notification.Service.Label + " is running."
+			msg = notification.Service.GetLabel() + " is running."
 		case services.ServiceDied:
-			msg = notification.Service.Label + " has died."
+			msg = notification.Service.GetLabel() + " has died."
 		case services.ServiceKilled:
-			msg = notification.Service.Label + " was terminated."
+			msg = notification.Service.GetLabel() + " was terminated."
 		}
 		log.Println(msg)
 	}

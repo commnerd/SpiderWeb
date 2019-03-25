@@ -14,10 +14,18 @@ type ServiceNotification struct {
 	Event ServiceEvent
 }
 
-type Service struct{
+type ServiceStruct struct {
 	Node Node
 	Label string
 	Index int
+}
+
+type Service interface {
+	GetNode() Node
+	GetLabel() string
+	GetIndex() int
+	SetIndex(int)
+	Run()
 }
 
 type Node interface {
@@ -25,10 +33,10 @@ type Node interface {
 	GetCommChannel() chan ServiceNotification
 	GetAddress() string
 	GetRole() string
-	RegisterService(*Service)
+	RegisterService(Service)
 }
 
 func Bootstrap(node Node) {
-	tunnel := Service(NewTunnel(node))
-	node.RegisterService(&tunnel)
+	tunnel := NewTunnel(node)
+	node.RegisterService(tunnel)
 }
