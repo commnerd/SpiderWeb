@@ -33,7 +33,7 @@ func (this *Tunnel) Run() {
 	go func() {
 		commChannel := this.GetNode().GetCommChannel()
 		commChannel <- ServiceNotification{ this, ServiceInitialized }
-		cmd := exec.Command("ssh", "-i", TunnelPrivateKey, this.Node.GetRegistrar().GetAddress())
+		cmd := exec.Command("ssh", "-i", TunnelPrivateKey, this.GetNode().GetRegistrar().GetAddress())
 		cmd.Run()
 		commChannel <- ServiceNotification{ this, ServiceDied }
 	}()

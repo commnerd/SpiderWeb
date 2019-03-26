@@ -23,10 +23,14 @@ type Node struct{
 
 func NewNode() Node {
 	return Node{
-		Role: NodeRoleRoot,
+		Role: NodeRoleRegistrar,
 		Address: "localhost",
 		CommChannel: make(chan services.ServiceNotification),
 		Services: make([]services.Service, 0),
+		Registrar: &Node{
+			Role: NodeRoleRoot,
+			Address: "spiderweb.com",
+		},
 	}
 }
 
@@ -36,6 +40,7 @@ func (this *Node) Run() {
 	for _, service := range(this.Services) {
 		service.Run()
 	}
+	this.monitorServices()
 	api.Run()
 }
 
@@ -67,19 +72,22 @@ func (this *Node) GetRole() string {
 }
 
 func (this *Node) monitorServices() {
-	for {
-		notification := <-this.CommChannel
-		msg := ""
-		switch notification.Event {
-		case services.ServiceInitialized:
-			msg = notification.Service.GetLabel() + " was started."
-		case services.ServiceRunning:
-			msg = notification.Service.GetLabel() + " is running."
-		case services.ServiceDied:
-			msg = notification.Service.GetLabel() + " has died."
-		case services.ServiceKilled:
-			msg = notification.Service.GetLabel() + " was terminated."
+	go func() {
+		for {
+			notification := <-this.CommChannel
+			msg := ""
+			switch notification.Event {
+			case services.ServiceInitialized:
+				msg =  "Starting " + notification.Service.GetLabel() + "."
+			case services.ServiceRunning:
+				msg = notification.Service.GetLabel() + " is running."
+			case services.ServiceDied:
+				msg = notification.Service.GetLabel() + " has died."
+				notification.Service.Run()
+			case services.ServiceKilled:
+				msg = notification.Service.GetLabel() + " was terminated."
+			}
+			log.Println(msg)
 		}
-		log.Println(msg)
-	}
+	}()
 }

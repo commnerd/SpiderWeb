@@ -77,8 +77,6 @@ func (this *Api) Run() {
 	log.Fatalln(http.Serve(l, r))
 }
 
-
-
 func (this *Api) Welcome(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Welcome to SpiderWeb!")
 }
