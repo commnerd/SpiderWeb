@@ -1,6 +1,6 @@
 version: "2"
 services:
-  root:
+  spiderweb.com:
     build:
       context: docker
     volumes:
@@ -14,28 +14,3 @@ services:
     environment:
       - NODE_ROLE=root
     command: "/node/sw-node"
-  registry:
-    image: spiderweb_root
-    volumes:
-      - .:/node
-      - ./configs/supervisor/conf.d:/etc/supervisor/conf.d
-    ports:
-      - 94:80
-    expose:
-      - 80
-      - 22
-    environment:
-      - ROOT_ADDR=root
-    depends_on:
-      - root
-    command: sh -c "sleep 1 && /node/sw-node"
-  node:
-    image: spiderweb_root
-    volumes:
-      - .:/node
-      - ./configs/supervisor/conf.d:/etc/supervisor/conf.d
-    environment:
-      - ROOT_ADDR=root
-    depends_on:
-      - registry
-    command: sh -c "sleep 1 && /node/sw-node"

@@ -22,9 +22,9 @@ type Service struct{
 
 type Node interface {
 	GetRegistrar() Node
-	GetCommChannel() chan ServiceNotification
+	GetServiceChannel() chan ServiceNotification
 	GetAddress() string
-	GetRole() string
+	GetRoleLabel() string
 	RegisterService(*Service)
 }
 

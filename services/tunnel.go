@@ -16,10 +16,10 @@ func NewTunnel(node Node) Tunnel {
 func (this *Tunnel) Run() {
 	go func() {
 		service := Service(*this)
-		commChannel := this.Node.GetCommChannel()
-		commChannel <- ServiceNotification{ service, ServiceInitialized }
+		serviceChannel := this.Node.GetServiceChannel()
+		serviceChannel <- ServiceNotification{ service, ServiceInitialized }
 		cmd := exec.Command("ssh", "-i", TunnelPrivateKey, this.Node.GetRegistrar().GetAddress())
 		cmd.Run()
-		commChannel <- ServiceNotification{ service, ServiceDied }
+		serviceChannel <- ServiceNotification{ service, ServiceDied }
 	}()
 }
