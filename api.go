@@ -138,6 +138,7 @@ func (this *Api) RegisterNode(w http.ResponseWriter, r *http.Request) {
 	node.UnmarshalJSON(body)
 
 	if node.Id == this.Node.Id {
+		node.Role = NodeRoleRoot
 		w.Write(node.MarshalJSON())
 		return
 	}
