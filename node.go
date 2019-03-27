@@ -29,6 +29,7 @@ type Node struct{
 	Registrar *Node
 	ServiceChannel chan services.ServiceNotification
 	Services []*services.Service
+	Registry []*RegistryNode
 }
 
 type JsonNode struct{
@@ -110,15 +111,21 @@ func (this *Node) UnmarshalJSON(contents []byte) {
 }
 
 func (this *Node) setRole() {
-	if this.isRoot() {
-		this.Role = NodeRoleRoot
-		return
+	resp, err := http.Post(RootNodeAddress, "application/json", bytes.NewBuffer(this.MarshalJSON()))
+	if(err != nil) {
+		log.Fatalln(err)
 	}
-	if this.isRegistrar() {
-		this.Role = NodeRoleRegistrar
-		return
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if(err != nil) {
+		log.Fatalln(err)
 	}
-	this.Role = NodeRoleWorker
+
+	var node Node
+	node.UnmarshalJSON(body)
+
+	this.Role = node.Role
 }
 
 func (this *Node) monitorServices() {
@@ -139,39 +146,6 @@ func (this *Node) monitorServices() {
 	}
 }
 
-func (this *Node) isRoot() bool {
-	return this.checkRole(NodeRoleRoot)
-}
-
-func (this *Node) isRegistrar() bool {
-	return this.checkRole(NodeRoleRegistrar)
-}
-
-func (this *Node) checkRole(role NodeRole) bool {
-	resp, err := http.Post(RootNodeAddress, "application/json", bytes.NewBuffer(this.MarshalJSON()))
-	if(err != nil) {
-		log.Fatalln(err)
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if(err != nil) {
-		log.Fatalln(err)
-	}
-
-	var node Node
-	node.UnmarshalJSON(body)
-
-	if role == NodeRoleRoot {
-		if this.Id == node.Id {
-			this.Address = RootNodeAddress
-			return true
-		}
-		return false
-	}
-	return false
-}
-
 func NewNode() Node {
 	return Node{
 		Id: uuid.New().String(),
@@ -180,6 +154,7 @@ func NewNode() Node {
 		Registrar: &Node{ Address: RootNodeAddress },
 		ServiceChannel: make(chan services.ServiceNotification),
 		Services: make([]*services.Service, 0),
+		Registry: make([]*RegistryNode, 0),
 	}
 }
 

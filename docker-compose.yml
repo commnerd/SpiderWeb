@@ -14,3 +14,18 @@ services:
     environment:
       - NODE_ROLE=root
     command: "/node/sw-node"
+  registry:
+    image: spiderweb_root
+    volumes:
+      - .:/node
+      - ./configs/supervisor/conf.d:/etc/supervisor/conf.d
+    ports:
+      - 94:80
+    expose:
+      - 80
+      - 22
+    environment:
+      - ROOT_ADDR=root
+    depends_on:
+      - spiderweb.com
+    command: sh -c "sleep 1 && /node/sw-node"
