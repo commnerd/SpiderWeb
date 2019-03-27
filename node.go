@@ -11,7 +11,7 @@ import (
 	"fmt"
 )
 
-const RootNodeAddress = "http://spiderweb.com/register"
+const RootNodeAddress = "http://spiderweb.com"
 
 type NodeRole int
 
@@ -24,6 +24,7 @@ const (
 
 type Node struct{
 	Id string
+	IdNetworkMask int
 	Role NodeRole
 	Address string
 	Registrar *Node
@@ -34,14 +35,16 @@ type Node struct{
 
 type JsonNode struct{
 	Id string           `json:"id,omitempty"`
+	IdNetworkMask int   `json:"id_network_mask"`
     Role string         `json:"role"`
     Address string      `json:"address"`
     Registrar *JsonNode `json:"registrar,omitempty"`
 }
 
 type RegistryNode struct{
-	Id string       `json:"id,omitempty"`
-    Address string  `json:"address"`
+	Id string         `json:"id,omitempty"`
+	IdNetworkMask int `json:"id_network_mask"`
+    Address string    `json:"address"`
 }
 
 func (this *Node) Run() {
@@ -106,6 +109,7 @@ func (this *Node) UnmarshalJSON(contents []byte) {
 	}
 
 	this.Id = jNode.Id
+	this.IdNetworkMask = jNode.IdNetworkMask
 	this.Role = GetRoleFromLabel(jNode.Role)
 	this.Address = jNode.Address
 }
@@ -125,7 +129,13 @@ func (this *Node) setRole() {
 	var node Node
 	node.UnmarshalJSON(body)
 
+	this.Id = node.Id
+	this.IdNetworkMask = node.IdNetworkMask
 	this.Role = node.Role
+	this.Address = node.Address
+	if this.Registrar.Id != node.Registrar.Id {
+		this.changeRegistrar(node.Registrar)
+	}
 }
 
 func (this *Node) monitorServices() {
@@ -146,9 +156,51 @@ func (this *Node) monitorServices() {
 	}
 }
 
+func (this *Node) changeRegistrar(newReg *Node) {
+	currentId := this.Id
+	if this.registerWithNewRegistrar(newReg) {
+		this.Registrar = newReg
+		this.dropOldRegistrar(currentId)
+	}
+}
+
+func (this *Node) contactNewRegistrar(newReg *Node) bool {
+	res, err := http.Post(newReg.Address+"/register", "application/json", this.MarshalJSON())
+	if err != nil {
+		return false
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if(err != nil) {
+		return false
+	}
+
+	var node Node
+	node.UnmarshalJSON(body)
+
+	this.Id = node.Id
+	this.IdNetworkMask = node.IdNetworkMask
+	this.Role = node.Role
+	this.Address = node.Address
+	if this.Registrar.Id != node.Registrar.Id {
+		this.changeRegistrar(node.Registrar)
+	}
+
+}
+
+func (this *Node) dropOldRegistrar(id string) {
+	client := &http.Client{}
+
+	req, _ := http.NewRequest("DELETE", "http://"+this.Registrar.Address+"/registry/"+id)
+
+	client.Do(req)
+}
+
 func NewNode() Node {
 	return Node{
 		Id: uuid.New().String(),
+		IdNetworkMask: 0,
 		Role: NodeRoleInit,
 		Address: "localhost",
 		Registrar: &Node{ Address: RootNodeAddress },

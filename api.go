@@ -48,6 +48,7 @@ func NewApi(node *Node) *Api {
 		Route{ Method: "GET", Path: "/", Handler: api.Welcome, Name: "home"},
 		Route{ Method: "GET", Path: "/node", Handler: api.GetNode, Name: "node"},
 		Route{ Method: "POST", Path: "/register", Handler: api.RegisterNode, Name: "register"},
+		Route{ Method: "DELETE", Path: "/registry/{nodeId}", Handler: api.DeleteRegistryNode, Name: "node"},
 	}
 
 	return api
@@ -124,6 +125,14 @@ func (this *Api) GetNode(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, string(json))
 }
 
+func (this *Api) DeleteRegistryNode(w http.ResponseWriter, r *http.Request) {
+	nodeId := mux.Vars(r)["nodeId"]
+
+	for i, node := range this.Node.Registry {
+		this.Node.Registry = append(this.Node.Registry[:i], a[i+1:]...)
+	}
+}
+
 func (this *Api) RegisterNode(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
@@ -149,6 +158,15 @@ func (this *Api) RegisterNode(w http.ResponseWriter, r *http.Request) {
     if err != nil {
         log.Fatalln(w, "userip: %q is not IP:port", r.RemoteAddr)
     }
+
+    node.Id = this.AlterChildId(node.Id)
+    node.Address = ip
+
+    node.Registrar = &Node{
+		Id: this.Id,
+		IdNetworkMask: this.IdNetworkMask,
+		Address: this.Address,
+	}
 
 	_, err = http.Get("http://"+ip)
 	if err != nil {
