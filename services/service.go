@@ -14,21 +14,26 @@ type ServiceNotification struct {
 	Event ServiceEvent
 }
 
-type Service struct{
-	Node Node
-	Label string
-	Index int
+type Service interface{
+	GetLabel() string
+	GetNode() Node
+	Run()
+}
+
+type Registry interface{
+	GetEventChannel() chan ServiceNotification
+	Add(Service)
+	Remove(Service)
 }
 
 type Node interface {
 	GetRegistrar() Node
-	GetServiceChannel() chan ServiceNotification
 	GetAddress() string
 	GetRoleLabel() string
-	RegisterService(*Service)
+	GetServiceRegistry() Registry
 }
 
 func Bootstrap(node Node) {
-	tunnel := Service(NewTunnel(node))
-	node.RegisterService(&tunnel)
+	tunnel := NewTunnel(node)
+	node.GetServiceRegistry().Add(tunnel)
 }

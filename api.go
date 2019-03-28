@@ -128,9 +128,7 @@ func (this *Api) GetNode(w http.ResponseWriter, r *http.Request) {
 func (this *Api) DeleteRegistryNode(w http.ResponseWriter, r *http.Request) {
 	nodeId := mux.Vars(r)["nodeId"]
 
-	for i, node := range this.Node.Registry {
-		this.Node.Registry = append(this.Node.Registry[:i], a[i+1:]...)
-	}
+	this.Node.NodeRegistry.Remove(nodeId)
 }
 
 func (this *Api) RegisterNode(w http.ResponseWriter, r *http.Request) {
@@ -148,6 +146,7 @@ func (this *Api) RegisterNode(w http.ResponseWriter, r *http.Request) {
 
 	if node.Id == this.Node.Id {
 		node.Role = NodeRoleRoot
+		node.Address = RootNodeAddress
 		w.Write(node.MarshalJSON())
 		return
 	}
@@ -163,9 +162,9 @@ func (this *Api) RegisterNode(w http.ResponseWriter, r *http.Request) {
     node.Address = ip
 
     node.Registrar = &Node{
-		Id: this.Id,
-		IdNetworkMask: this.IdNetworkMask,
-		Address: this.Address,
+		Id: this.Node.Id,
+		IdNetworkMask: this.Node.IdNetworkMask,
+		Address: this.Node.Address,
 	}
 
 	_, err = http.Get("http://"+ip)
@@ -186,4 +185,8 @@ func (this *Api) RegisterNode(w http.ResponseWriter, r *http.Request) {
 	node.Role = NodeRoleWorker
 	w.Write(node.MarshalJSON())
 	return
+}
+
+func (this *Api) AlterChildId(id string) string {
+	return this.Node.Id[:this.Node.IdNetworkMask] + id[this.Node.IdNetworkMask+1:]
 }

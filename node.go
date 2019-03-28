@@ -28,9 +28,8 @@ type Node struct{
 	Role NodeRole
 	Address string
 	Registrar *Node
-	ServiceChannel chan services.ServiceNotification
-	Services []*services.Service
-	Registry []*RegistryNode
+	ServiceRegistry *ServiceRegistry
+	NodeRegistry *NodeRegistry
 }
 
 type JsonNode struct{
@@ -41,26 +40,20 @@ type JsonNode struct{
     Registrar *JsonNode `json:"registrar,omitempty"`
 }
 
-type RegistryNode struct{
-	Id string         `json:"id,omitempty"`
-	IdNetworkMask int `json:"id_network_mask"`
-    Address string    `json:"address"`
-}
-
 func (this *Node) Run() {
+	this.ServiceRegistry = NewServiceRegistry(this)
 	services.Bootstrap(this)
 	api := NewApi(this)
 	go this.setRole()
 	api.Run()
 }
 
-func (this *Node) RegisterService(service *services.Service) {
-	service.Index = len(this.Services)
-	this.Services = append(this.Services, service)
+func (this *Node) GetNodeRegistry() *NodeRegistry {
+	return this.NodeRegistry
 }
 
-func (this *Node) GetServiceChannel() chan services.ServiceNotification {
-	return this.ServiceChannel
+func (this *Node) GetServiceRegistry() services.Registry {
+	return this.ServiceRegistry
 }
 
 func (this *Node) GetRegistrar() services.Node {
@@ -115,7 +108,7 @@ func (this *Node) UnmarshalJSON(contents []byte) {
 }
 
 func (this *Node) setRole() {
-	resp, err := http.Post(RootNodeAddress, "application/json", bytes.NewBuffer(this.MarshalJSON()))
+	resp, err := http.Post(this.Registrar.Address+"/register", "application/json", bytes.NewBuffer(this.MarshalJSON()))
 	if(err != nil) {
 		log.Fatalln(err)
 	}
@@ -129,85 +122,44 @@ func (this *Node) setRole() {
 	var node Node
 	node.UnmarshalJSON(body)
 
+	if node.Registrar != nil && this.Registrar.Address != node.Registrar.Address {
+		this.changeRegistrar(node.Registrar)
+		return
+	}
+
 	this.Id = node.Id
 	this.IdNetworkMask = node.IdNetworkMask
 	this.Role = node.Role
 	this.Address = node.Address
-	if this.Registrar.Id != node.Registrar.Id {
-		this.changeRegistrar(node.Registrar)
-	}
-}
-
-func (this *Node) monitorServices() {
-	for {
-		notification := <-this.ServiceChannel
-		msg := ""
-		switch notification.Event {
-		case services.ServiceInitialized:
-			msg = notification.Service.Label + " was started."
-		case services.ServiceRunning:
-			msg = notification.Service.Label + " is running."
-		case services.ServiceDied:
-			msg = notification.Service.Label + " has died."
-		case services.ServiceKilled:
-			msg = notification.Service.Label + " was terminated."
-		}
-		log.Println(msg)
-	}
 }
 
 func (this *Node) changeRegistrar(newReg *Node) {
-	currentId := this.Id
-	if this.registerWithNewRegistrar(newReg) {
-		this.Registrar = newReg
-		this.dropOldRegistrar(currentId)
-	}
+	oldId := this.Id
+	oldRegAddress := this.Registrar.Address
+	this.Registrar = newReg
+	this.setRole()
+	this.dropOldRegistrar(oldRegAddress, oldId)
 }
 
-func (this *Node) contactNewRegistrar(newReg *Node) bool {
-	res, err := http.Post(newReg.Address+"/register", "application/json", this.MarshalJSON())
-	if err != nil {
-		return false
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if(err != nil) {
-		return false
-	}
-
-	var node Node
-	node.UnmarshalJSON(body)
-
-	this.Id = node.Id
-	this.IdNetworkMask = node.IdNetworkMask
-	this.Role = node.Role
-	this.Address = node.Address
-	if this.Registrar.Id != node.Registrar.Id {
-		this.changeRegistrar(node.Registrar)
-	}
-
-}
-
-func (this *Node) dropOldRegistrar(id string) {
+func (this *Node) dropOldRegistrar(oldRegAddress string, id string) {
 	client := &http.Client{}
 
-	req, _ := http.NewRequest("DELETE", "http://"+this.Registrar.Address+"/registry/"+id)
+	req, _ := http.NewRequest("DELETE", "http://"+oldRegAddress+"/registry/"+id, nil)
 
 	client.Do(req)
 }
 
 func NewNode() Node {
-	return Node{
+	node := Node{
 		Id: uuid.New().String(),
 		IdNetworkMask: 0,
 		Role: NodeRoleInit,
 		Address: "localhost",
 		Registrar: &Node{ Address: RootNodeAddress },
-		ServiceChannel: make(chan services.ServiceNotification),
-		Services: make([]*services.Service, 0),
-		Registry: make([]*RegistryNode, 0),
 	}
+	node.ServiceRegistry = NewServiceRegistry(&node)
+	node.NodeRegistry = NewNodeRegistry(&node)
+	return node
 }
 
 func GetRoleFromLabel(label string) NodeRole {
