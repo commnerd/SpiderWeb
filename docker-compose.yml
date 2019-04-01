@@ -15,7 +15,7 @@ services:
       - NODE_ROLE=root
     command: "/node/sw-node"
   registry:
-    image: spiderweb_root
+    image: spiderweb_spiderweb.com
     volumes:
       - .:/node
       - ./configs/supervisor/conf.d:/etc/supervisor/conf.d
