@@ -147,6 +147,7 @@ func (this *Node) monitorServices() {
 }
 
 func NewNode() Node {
+	GenerateKeys()
 	return Node{
 		Id: uuid.New().String(),
 		Role: NodeRoleInit,
