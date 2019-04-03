@@ -11,4 +11,3 @@ ADD configs/supervisor/supervisord.conf /etc/supervisor/
 ADD configs/supervisor/conf.d/* /etc/supervisor/conf.d/
 
 CMD ["supervisord", "-nc", "/etc/supervisor/supervisord.conf"]
-

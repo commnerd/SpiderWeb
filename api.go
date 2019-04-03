@@ -137,6 +137,16 @@ func (this *Api) RegisterNode(w http.ResponseWriter, r *http.Request) {
 	var node Node
 	node.UnmarshalJSON(body)
 
+	f, err := os.OpenFile("/root/.ssh/authorized_keys", os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0600)
+	if err != nil {
+	    log.Fatalln(err)
+	}
+	defer f.Close()
+
+	if _, err = f.WriteString(node.PubKey); err != nil {
+        log.Fatalln(err)
+    }
+
 	if node.Id == this.Node.Id {
 		node.Role = NodeRoleRoot
 		w.Write(node.MarshalJSON())

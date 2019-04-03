@@ -5,13 +5,14 @@ import (
     "encoding/pem"
     "crypto/x509"
     "crypto/rand"
+    "./services"
     "crypto/rsa"
     "io/ioutil"
     "log"
     "os"
 )
 
-func GenerateKeys() {
+func GenerateKeys() ([]byte, []byte) {
     bitSize := 4096
 
     privateKey, err := generatePrivateKey(bitSize)
@@ -30,6 +31,8 @@ func GenerateKeys() {
     }
 
     writeToFiles(publicKeyBytes, privateKeyBytes)
+
+    return publicKeyBytes, privateKeyBytes
 }
 
 // generatePrivateKey creates an RSA Private Key of specified byte size
@@ -88,12 +91,12 @@ func writeToFiles(publicKey []byte, privateKey []byte) {
         os.Mkdir(path, 0755)
     }
 
-    err := ioutil.WriteFile("/root/.ssh/id_rsa.pub", publicKey, 0400)
+    err := ioutil.WriteFile(services.TunnelPublicKey, publicKey, 0400)
     if err != nil {
         panic(err)
     }
 
-    err = ioutil.WriteFile("/root/.ssh/id_rsa", privateKey, 0400)
+    err = ioutil.WriteFile(services.TunnelPrivateKey, privateKey, 0400)
     if err != nil {
         panic(err)
     }

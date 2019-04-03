@@ -30,6 +30,7 @@ type Node struct{
 	ServiceChannel chan services.ServiceNotification
 	Services []*services.Service
 	Registry []*RegistryNode
+	PubKey string
 }
 
 type JsonNode struct{
@@ -37,6 +38,7 @@ type JsonNode struct{
     Role string         `json:"role"`
     Address string      `json:"address"`
     Registrar *JsonNode `json:"registrar,omitempty"`
+    PubKey string 		`json:"id_rsa_pub,omitempty"`
 }
 
 type RegistryNode struct{
@@ -87,6 +89,7 @@ func (this *Node) MarshalJSON() []byte {
         Id: this.Id,
         Role: this.GetRoleLabel(),
         Address:  this.Address,
+        PubKey: this.PubKey,
     }
 
 	data, err := json.Marshal(jNode)
@@ -108,6 +111,7 @@ func (this *Node) UnmarshalJSON(contents []byte) {
 	this.Id = jNode.Id
 	this.Role = GetRoleFromLabel(jNode.Role)
 	this.Address = jNode.Address
+	this.PubKey = jNode.PubKey
 }
 
 func (this *Node) setRole() {
@@ -147,7 +151,7 @@ func (this *Node) monitorServices() {
 }
 
 func NewNode() Node {
-	GenerateKeys()
+	pubKey, _ := GenerateKeys()
 	return Node{
 		Id: uuid.New().String(),
 		Role: NodeRoleInit,
@@ -156,6 +160,7 @@ func NewNode() Node {
 		ServiceChannel: make(chan services.ServiceNotification),
 		Services: make([]*services.Service, 0),
 		Registry: make([]*RegistryNode, 0),
+		PubKey: string(pubKey),
 	}
 }
 
