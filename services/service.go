@@ -16,8 +16,6 @@ type ServiceNotification struct {
 
 type Service struct{
 	Node Node
-	Label string
-	Index int
 }
 
 type Node interface {
@@ -29,6 +27,8 @@ type Node interface {
 }
 
 func Bootstrap(node Node) {
-	tunnel := Service(NewTunnel(node))
-	node.RegisterService(&tunnel)
+	if node.GetRoleLabel() == "worker" {
+		tunnel := Service(NewTunnel(node))
+		node.RegisterService(&tunnel)
+	}
 }

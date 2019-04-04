@@ -6,6 +6,7 @@ import (
 	"./services"
 	"io/ioutil"
 	"net/http"
+	"reflect"
 	"bytes"
 	"log"
 	"fmt"
@@ -54,7 +55,6 @@ func (this *Node) Run() {
 }
 
 func (this *Node) RegisterService(service *services.Service) {
-	service.Index = len(this.Services)
 	this.Services = append(this.Services, service)
 }
 
@@ -138,13 +138,13 @@ func (this *Node) monitorServices() {
 		msg := ""
 		switch notification.Event {
 		case services.ServiceInitialized:
-			msg = notification.Service.Label + " was started."
+			msg = reflect.TypeOf(notification.Service).String() + " was started."
 		case services.ServiceRunning:
-			msg = notification.Service.Label + " is running."
+			msg = reflect.TypeOf(notification.Service).String() + " is running."
 		case services.ServiceDied:
-			msg = notification.Service.Label + " has died."
+			msg = reflect.TypeOf(notification.Service).String() + " has died."
 		case services.ServiceKilled:
-			msg = notification.Service.Label + " was terminated."
+			msg = reflect.TypeOf(notification.Service).String() + " was terminated."
 		}
 		log.Println(msg)
 	}

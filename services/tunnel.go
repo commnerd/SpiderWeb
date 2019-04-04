@@ -10,7 +10,7 @@ const (
 type Tunnel Service
 
 func NewTunnel(node Node) Tunnel {
-	return Tunnel{ node, "tunnel", 0}
+	return Tunnel{ node }
 }
 
 func (this *Tunnel) Run() {

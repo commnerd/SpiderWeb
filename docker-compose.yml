@@ -6,7 +6,7 @@ services:
     image: spiderweb.com
     volumes:
       - ./sw-node:/usr/bin/sw-node
-      - ./configs/supervisor/conf.d:/etc/supervisor/conf.d
+      - ./docker/configs/supervisor/conf.d:/etc/supervisor/conf.d
     ports:
       - 93:80
     expose:
@@ -18,7 +18,7 @@ services:
     image: spiderweb.com
     volumes:
       - ./sw-node:/usr/bin/sw-node
-      - ./configs/supervisor/conf.d:/etc/supervisor/conf.d
+      - ./docker/configs/supervisor/conf.d:/etc/supervisor/conf.d
     ports:
       - 94:80
     expose:
