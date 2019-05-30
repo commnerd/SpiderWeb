@@ -2,21 +2,10 @@
 package web
 
 // The web service held open for node communications
-type Server interface{
-    Start()
-}
+interface Server{}
 
 // The request structure passed to a server
-type Request interface{
-    GetVerb() string
-    GetReferer() string
-    GetBody() string
-}
+interface Request{}
 
 // The response structure returned from a server
-type Response interface{
-    SetFormat(string)
-    GetFormat() string
-    SetBody(string)
-    GetBody() string
-}
+interface Response{}

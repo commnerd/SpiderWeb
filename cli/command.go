@@ -3,25 +3,20 @@
 package main
 
 import (
-	"strings"
-	"reflect"
 	"fmt"
 	"os"
 )
 
-type cli struct{}
-
 // Get the help string for the top level cli
-func GetHelp() string {
+func Help() string {
 	return `Usage: sw COMMAND ARGS
 
 A command-line tool for interacting with SpiderWeb
 `
 }
 
-// Run the help command
-func HelpCommand() {
-	fmt.Print(GetHelp())
+func Hello() string {
+	return "Hello World"
 }
 
 // Main is the enterypoint for the command line tool
@@ -30,17 +25,14 @@ func main() {
 		runCommand()
 		return
 	}
-	HelpCommand()
+	fmt.Print(Help())
 }
 
-// Map and execute the appropriate command
 func runCommand() {
-	cmd := strings.Title(os.Args[1]) + "Command"
-	c := cli{}
-	target, ok := reflect.TypeOf(c).MethodByName(cmd)
-	if ok {
-	    target.Func.Call([]reflect.Value{reflect.ValueOf(c)})
+	switch(os.Args[1]) {
+	case "hello":
+		fmt.Print(Hello())
+	default:
+		fmt.Print(Help())
 	}
-	HelpCommand()
-	os.Exit(1)
 }
