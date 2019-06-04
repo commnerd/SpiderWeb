@@ -9,14 +9,16 @@ import (
 	"os"
 )
 
+const Help string = `Usage: sw COMMAND ARGS
+
+A command-line tool for interacting with SpiderWeb
+`
+
 type cli struct{}
 
 // Get the help string for the top level cli
 func GetHelp() string {
-	return `Usage: sw COMMAND ARGS
-
-A command-line tool for interacting with SpiderWeb
-`
+	return Help
 }
 
 // Run the help command

@@ -9,7 +9,7 @@ import (
 
 func TestEmptyHelpMessage(t *testing.T) {
     got := tools.GetStdOut(main)
-    if got != GetHelp() {
+    if got != Help {
         t.Errorf("Got: %s", got)
     }
 }
