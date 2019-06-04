@@ -2,10 +2,10 @@
 package web
 
 // The web service held open for node communications
-interface Server{}
+type Server interface{}
 
 // The request structure passed to a server
-interface Request{}
+type Request interface{}
 
 // The response structure returned from a server
-interface Response{}
+type Response interface{}
