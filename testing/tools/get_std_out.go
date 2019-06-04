@@ -6,7 +6,7 @@ import (
     "os"
 )
 
-func GetStdOut(f func()) string {
+func GetFunctionStdOut(f func()) string {
     old := os.Stdout // keep backup of the real stdout
     r, w, _ := os.Pipe()
     os.Stdout = w

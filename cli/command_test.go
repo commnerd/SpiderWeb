@@ -1,36 +1,70 @@
 package main
 
 import (
-    tools "github.com/commnerd/SpiderWeb/testing/tools"
+    "io/ioutil"
     "testing"
+    "os/exec"
+    "log"
+    "fmt"
     "os"
 )
 
-func TestEmptyHelpMessage(t *testing.T) {
-    got := tools.GetStdOut(main)
-    if got != Help() {
-        t.Errorf("Got: %s", got)
+// The command executable for the test suite
+const TestCmd string = "./sw-test"
+
+// Set up the test suite
+func setup() error {
+    err := exec.Command("go", "get", "-d").Run()
+    if err != nil {
+        return err
+    }
+    err = exec.Command("go", "build", "-o", TestCmd).Run()
+    if err != nil {
+        return err
+    }
+    return nil
+}
+
+// Tear down the test suite
+func teardown() {
+    if _, err := os.Stat(TestCmd); err == nil {
+        os.Remove(TestCmd)
     }
 }
 
-func TestBadCommandHelpMessage(t *testing.T) {
-    oldArgs := os.Args
-    defer func() { os.Args = oldArgs }()
+// Prepare the test suite
+func TestMain(m *testing.M) {
+    err := setup()
 
-    os.Args = []string{"sw", "blah"}
-    got := tools.GetStdOut(main)
-    if got != Help() {
-        t.Errorf("Got: %s", got)
+    if err == nil {
+        m.Run()
     }
+
+    teardown()
 }
 
-func TestHelloCommand(t *testing.T) {
-    oldArgs := os.Args
-    defer func() { os.Args = oldArgs }()
+// Test to ensure we get help output on blank command call
+func TestHelper(t *testing.T) {
+    cmd := exec.Command(TestCmd)
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+        log.Fatal(err)
+	}
 
-    os.Args = []string{"sw", "hello"}
-    got := tools.GetStdOut(main)
-    if got != Hello() {
-        t.Errorf("Got: %s", got)
+	if err = cmd.Start(); err != nil {
+        log.Fatal(err)
+	}
+
+	out, err := ioutil.ReadAll(stdout)
+    if err != nil {
+        log.Fatal(err)
+	}
+    if string(out) != Help {
+        t.Errorf("Expecting help text as output to stderr")
+        fmt.Println(string(out))
     }
+
+	if err := cmd.Wait(); err == nil {
+        t.Errorf("Expecting error status 1, got 0")
+	}
 }
