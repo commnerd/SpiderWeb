@@ -16,14 +16,9 @@ A command-line tool for interacting with SpiderWeb
 
 type cli struct{}
 
-// Get the help string for the top level cli
-func GetHelp() string {
-	return Help
-}
-
 // Run the help command
 func HelpCommand() {
-	fmt.Print(GetHelp())
+	fmt.Print(Help)
 }
 
 // Main is the enterypoint for the command line tool
@@ -33,6 +28,7 @@ func main() {
 		return
 	}
 	HelpCommand()
+	os.Exit(1)
 }
 
 // Map and execute the appropriate command
@@ -43,6 +39,4 @@ func runCommand() {
 	if ok {
 	    target.Func.Call([]reflect.Value{reflect.ValueOf(c)})
 	}
-	HelpCommand()
-	os.Exit(1)
 }
