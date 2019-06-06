@@ -1,16 +1,15 @@
 package main
 
 import (
-    "github.com/commnerd/SpiderWeb/testing/tools"
+    "../testing/tools"
     "testing"
     "os/exec"
 )
 
-func TestServer(t *testing.T) {
+func ServerTest(t *testing.T) {
     cmd := exec.Command(TestCmd, "server")
     out := tools.GetCmdStdOut(cmd)
-    if out == "Servers" {
-        return
+    if out != ServerHelp {
+        t.Fatalf("Expected help message, Got: \"" + out + "\".")
     }
-    t.Fatalf("Expected \"Servers\", Got: \"" + out + "\".")
 }

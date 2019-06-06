@@ -44,7 +44,7 @@ func TestMain(m *testing.M) {
 }
 
 // Test to ensure we get help output on blank command call
-func TestHelper(t *testing.T) {
+func TestEmptySubcommand(t *testing.T) {
     cmd := exec.Command(TestCmd)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
@@ -59,7 +59,7 @@ func TestHelper(t *testing.T) {
     if err != nil {
         log.Fatal(err)
 	}
-    if string(out) != Help {
+    if string(out) != fmt.Sprintf("%s\n%s", SubCmdError, Help) {
         t.Errorf("Expecting help text as output to stderr")
         fmt.Println(string(out))
     }
