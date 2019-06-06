@@ -25,3 +25,9 @@ func (this msg) GetType() MessageType {
 func (this msg) GetPayload() interface{} {
 
 }
+
+// Send the message
+func (this msg) Send() {
+    agent := messages.NewMsgXferAgent()
+    agent.SendMessage(this)
+}
