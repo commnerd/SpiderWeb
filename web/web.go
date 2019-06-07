@@ -1,8 +1,10 @@
 // The web package provides all necessary endpoints for messaging between nodes
-package web
+package main 
 
 import (
+    "github.com/gorilla/mux"
     "net/http"
+    "log"
 )
 
 type Handler func(http.ResponseWriter, *http.Request)
@@ -20,7 +22,9 @@ type Route interface{
 }
 
 // The structure for maintaining server state
-type server struct{}
+type server struct{
+    router *mux.Router
+}
 
 // The web service held open for node communications
 type Server interface{
@@ -28,11 +32,13 @@ type Server interface{
 }
 
 func NewServer() *server {
-    return &server{}
+    return &server{ mux.NewRouter() }
 }
 
 // Start the web server
-func (s *server) Start() {
+func (this *server) Start() {
+    // Bind to a port and pass our router in
+    log.Fatal(http.ListenAndServe(":8000", this.router))
 }
 
 // The structure definition of a request
@@ -52,4 +58,9 @@ type response struct{}
 type Response interface{
     GetFormat() string
     GetBody() string
+}
+
+func main() {
+	s := NewServer()
+	s.Start()
 }
