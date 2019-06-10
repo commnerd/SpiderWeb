@@ -1,27 +1,24 @@
 package models
 
-import (
-    "net/url"
-)
-
 // Node structure
 type node struct{
-    Url *url.URL
+    Config Config
+    Services []Service
 }
 
 // Node interface
 type Node interface{
-    GetUrl() *url.URL
+    StartService(Service)
 }
 
 // Craft and return a new Node
-func NewNode(loc *url.URL) *node {
+func NewNode() *node {
     return &node{
-        Url: loc,
+        Services: make([]Service, 0),
     }
 }
 
-// Get the Node's url
-func (this *node) GetUrl() *url.URL {
-    return this.Url
+// Start a service on the node
+func (this *node) StartService(s Service) {
+    this.Services = append(this.Services, s)
 }
