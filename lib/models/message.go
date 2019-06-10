@@ -11,7 +11,9 @@ type MessageType int
 
 // Message types
 const (
-	LoginRequest MessageType = iota
+    InitRequest MessageType = iota
+    InitResponse
+	LoginRequest
 	LoginResponse
 	TunnelRequest
 	TunnelResponse
