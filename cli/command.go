@@ -17,16 +17,19 @@ const (
 A command-line tool for interacting with SpiderWeb
 
 Commands:
+  login     Send username/password to the network for authentication
   server    Find a server using various filters
   servers   List servers owned by you
 `
 )
 
+var cmdString string = fmt.Sprintf(filepath.Base(os.Args[0]))
+
 type cli struct{}
 
 // Run the help command
 func HelpCommand() {
-	fmt.Printf(Help, fmt.Sprintf(filepath.Base(os.Args[0])))
+	fmt.Printf(Help, cmdString)
 }
 
 // Main is the enterypoint for the command line tool

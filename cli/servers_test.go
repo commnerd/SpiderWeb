@@ -4,13 +4,13 @@ import (
     "../testing/tools"
     "testing"
     "os/exec"
-    "os"
+    "fmt"
 )
 
-func ServersTest(t *testing.T) {
-    cmd := exec.Command(os.Args[0], "servers")
+func TestServers(t *testing.T) {
+    cmd := exec.Command(cmdString, "servers")
+    serversHelp := fmt.Sprintf(ServersHelp, cmdString)
     out := tools.GetCmdStdOut(cmd)
-    if out != ServersHelp {
-        t.Fatalf("Expected servers help message, Got: \"%v\".", out)
+    if out != serversHelp {
+        t.Fatalf("\nExpected: \"%v\",\nGot: \"%v\".", serversHelp, out)    }
     }
-}
