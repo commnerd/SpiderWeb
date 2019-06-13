@@ -4,13 +4,12 @@ import (
     "../testing/tools"
     "testing"
     "os/exec"
-    "os"
 )
 
-func ServersTest(t *testing.T) {
-    cmd := exec.Command(os.Args[0], "servers")
+func VolumesTest(t *testing.T) {
+    cmd := exec.Command(TestCmd, "volumes")
     out := tools.GetCmdStdOut(cmd)
-    if out != ServersHelp {
+    if out != VolumesHelp {
         t.Fatalf("Expected servers help message, Got: \"%v\".", out)
     }
 }

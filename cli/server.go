@@ -3,9 +3,10 @@ package main
 import (
     "flag"
     "fmt"
+    "os"
 )
 
-const ServerHelp string = `Usage: sw server [ARGS]...
+const ServerHelp string = `Usage: %v server [ARGS]...
 
 Find a server using various filters
 
@@ -17,5 +18,5 @@ Args:
 func (c cli) ServerCommand() {
 
     flag.NewFlagSet("server", flag.ExitOnError)
-    fmt.Print(ServerHelp)
+    fmt.Printf(ServerHelp, os.Args[0])
 }
