@@ -1,6 +1,7 @@
 package main
 
 import (
+    "path/filepath"
     "io/ioutil"
     "testing"
     "os/exec"
@@ -10,7 +11,7 @@ import (
 )
 
 // The command executable for the test suite
-const TestCmd string = "./sw-test"
+var TestCmd string = fmt.Sprintf(filepath.Base(os.Args[0]))
 
 // Set up the test suite
 func setup() error {
@@ -59,7 +60,9 @@ func TestEmptySubcommand(t *testing.T) {
     if err != nil {
         log.Fatal(err)
 	}
-    if string(out) != fmt.Sprintf("%s\n%s", SubCmdError, Help) {
+
+    help := fmt.Sprintf(Help, TestCmd)
+    if string(out) != fmt.Sprintf("%s\n%s", SubCmdError, help) {
         t.Errorf("Expecting help text as output to stderr")
         fmt.Println(string(out))
     }

@@ -3,6 +3,7 @@
 package main
 
 import (
+	"path/filepath"
 	"strings"
 	"reflect"
 	"fmt"
@@ -11,7 +12,7 @@ import (
 
 const (
 	SubCmdError string = "Subcommand expected"
-	Help string = `Usage: sw COMMAND
+	Help string = `Usage: %v COMMAND
 
 A command-line tool for interacting with SpiderWeb
 
@@ -25,7 +26,7 @@ type cli struct{}
 
 // Run the help command
 func HelpCommand() {
-	fmt.Print(Help)
+	fmt.Printf(Help, fmt.Sprintf(filepath.Base(os.Args[0])))
 }
 
 // Main is the enterypoint for the command line tool
