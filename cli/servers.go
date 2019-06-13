@@ -11,5 +11,5 @@ Args:
 `
 
 func (c cli) ServersCommand() {
-    fmt.Printf("Servers")
+    fmt.Printf(ServersHelp, cmdString)
 }

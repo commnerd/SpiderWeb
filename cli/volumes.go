@@ -1,15 +1,17 @@
 package main
 
-import "fmt"
+import (
+    "fmt"
+)
 
-const VolumesHelp string = `Usage: %v servers [ARGS]...
+const VolumesHelp string = `Usage: %v volumes [ARGS]...
 
-List servers owned by you
+List volumes owned by you
 
 Args:
   --help, -h Print this message
 `
 
 func (c cli) VolumesCommand() {
-    fmt.Printf("Volumes")
+    fmt.Printf(VolumesHelp, cmdString)
 }

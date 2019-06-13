@@ -3,7 +3,6 @@ package main
 import (
     "flag"
     "fmt"
-    "os"
 )
 
 const ServerHelp string = `Usage: %v server [ARGS]...
@@ -18,5 +17,5 @@ Args:
 func (c cli) ServerCommand() {
 
     flag.NewFlagSet("server", flag.ExitOnError)
-    fmt.Printf(ServerHelp, os.Args[0])
+    fmt.Printf(ServerHelp, cmdString)
 }

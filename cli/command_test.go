@@ -1,7 +1,6 @@
 package main
 
 import (
-    "path/filepath"
     "io/ioutil"
     "testing"
     "os/exec"
@@ -10,16 +9,13 @@ import (
     "os"
 )
 
-// The command executable for the test suite
-var TestCmd string = fmt.Sprintf(filepath.Base(os.Args[0]))
-
 // Set up the test suite
 func setup() error {
     err := exec.Command("go", "get", "-d").Run()
     if err != nil {
         return err
     }
-    err = exec.Command("go", "build", "-o", TestCmd).Run()
+    err = exec.Command("go", "build", "-o", cmdString).Run()
     if err != nil {
         return err
     }
@@ -28,8 +24,8 @@ func setup() error {
 
 // Tear down the test suite
 func teardown() {
-    if _, err := os.Stat(TestCmd); err == nil {
-        os.Remove(TestCmd)
+    if _, err := os.Stat(cmdString); err == nil {
+        os.Remove(cmdString)
     }
 }
 
@@ -46,7 +42,7 @@ func TestMain(m *testing.M) {
 
 // Test to ensure we get help output on blank command call
 func TestEmptySubcommand(t *testing.T) {
-    cmd := exec.Command(TestCmd)
+    cmd := exec.Command(cmdString)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
         log.Fatal(err)
@@ -61,7 +57,7 @@ func TestEmptySubcommand(t *testing.T) {
         log.Fatal(err)
 	}
 
-    help := fmt.Sprintf(Help, TestCmd)
+    help := fmt.Sprintf(Help, cmdString)
     if string(out) != fmt.Sprintf("%s\n%s", SubCmdError, help) {
         t.Errorf("Expecting help text as output to stderr")
         fmt.Println(string(out))
