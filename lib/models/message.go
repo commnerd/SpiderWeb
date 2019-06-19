@@ -23,13 +23,13 @@ const (
 	PublicCheck
 	PublicResponse
 	PublicTunnelResponse
-	KeyUpdateNotifications
+	KeyUpdateNotification
 )
 // The groundwork for all node communications
 type Message interface {
 	GetType() MessageType
 	GetPayload() interface{}
-    Send() error
+    CraftRequest() http.Request
 }
 
 // Craft a new message
