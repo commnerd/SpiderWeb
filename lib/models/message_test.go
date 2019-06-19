@@ -1,12 +1,20 @@
 package models
 
 import (
+    "net/http"
     "testing"
 )
 
-func TestNewMessage(t *testing.T) {
-    m := NewMessage(LoginRequest)
-    if m.GetType() != LoginRequest {
-        t.Errorf("MessageType - Expected %v, Got %v", LoginRequest, m.GetType())
+type testMessage struct{}
+
+func (this *testMessage) BuildRequest() *http.Request {
+    req, _ := http.NewRequest("GET", "http://example.com", nil)
+    return req
+}
+
+func TestMessageBuildRequest(t *testing.T) {
+    msg := &testMessage{}
+    if _, ok := interface{}(msg).(Message); !ok {
+        t.Errorf("Not a message.")
     }
 }

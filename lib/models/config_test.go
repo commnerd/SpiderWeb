@@ -3,20 +3,19 @@ package models
 import (
     "net/url"
     "testing"
+    "reflect"
 )
 
 func TestNewConfig(t *testing.T) {
-    master, _ := url.Parse("https://spiderweb.com/")
-    keyValMap := map[string]interface{}{
+    master, _ := url.Parse("https://spiderweb.com")
+    keyValMap := &config{
         "MASTER": master,
     }
 
     config := NewConfig()
 
-    for k, v := keyValMap {
-        if config[k] != v {
-            t.Errorf("Expected: \"%v\"\nGot: \"%v\"", v, config[k])
-        }
+    if !reflect.DeepEqual(keyValMap, config) {
+        t.Errorf("Expected: \"%v\"\nGot: \"%v\"", keyValMap, config)
     }
 }
 

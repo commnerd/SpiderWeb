@@ -13,12 +13,13 @@ type Transmitter interface{
     Transmit(models.Message) error
 }
 
-func NewTransmitter() Transmitter {        
+func NewTransmitter() Transmitter {
     return &transmitter{
         client: &http.Client{}
     }
 }
 
 func (this *transmitter) Transmit(m models.Message) error {
+    m.CraftRequest() http.Request
     return nil
 }
