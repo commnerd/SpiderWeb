@@ -11,7 +11,10 @@ import (
 )
 
 const (
+	// SubCmdError : Subcommand error text
 	SubCmdError string = "Subcommand expected"
+
+	// Help : Help text
 	Help string = `Usage: %v COMMAND
 
 A command-line tool for interacting with SpiderWeb
@@ -23,11 +26,11 @@ Commands:
 `
 )
 
-var cmdString string = fmt.Sprintf(filepath.Base(os.Args[0]))
+var cmdString = fmt.Sprintf(filepath.Base(os.Args[0]))
 
 type cli struct{}
 
-// Run the help command
+// HelpCommand : Run the help command
 func HelpCommand() {
 	fmt.Printf(Help, cmdString)
 }
@@ -43,7 +46,7 @@ func main() {
 	runCommand()
 }
 
-// Map and execute the appropriate command
+// runCommand : Map and execute the appropriate command
 func runCommand() {
 	cmd := strings.Title(os.Args[1]) + "Command"
 	c := cli{}

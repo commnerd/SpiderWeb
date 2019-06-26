@@ -11,7 +11,11 @@ import (
 
 // Set up the test suite
 func setup() error {
-    err := exec.Command("go", "get", "-d").Run()
+    err := exec.Command("PATH=.:$PATH").Run()
+    if err != nil {
+        return err
+    }
+    err = exec.Command("go", "get", "-d").Run()
     if err != nil {
         return err
     }

@@ -1,4 +1,4 @@
-// The messages package provides message constructs to communicate between nodes
+// Package messages : The messages package provides message constructs to communicate between nodes
 package messages
 
 // Message structure
@@ -12,7 +12,7 @@ type MessageType int
 
 // Type constants
 const (
-	LoginRequest int = iota
+	LoginRequest MessageType = iota
 	LoginResponse
 	TunnelRequest
 	TunnelResponse
@@ -25,8 +25,8 @@ const (
 	KeyUpdateNotifications
 )
 
-// The groundwork for all node communications
+// Message : The groundwork for all node communications
 type Message interface{
-	getType() int
+	getType() MessageType
 	getPayload() interface{}
 }
