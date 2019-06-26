@@ -23,6 +23,7 @@ Commands:
   login     Send username/password to the network for authentication
   server    Find a server using various filters
   servers   List servers owned by you
+  volumes   List volumes owned by you
 `
 )
 

@@ -9,13 +9,11 @@ import (
     "os"
 )
 
+var execString string
+
 // Set up the test suite
 func setup() error {
-    err := exec.Command("PATH=.:$PATH").Run()
-    if err != nil {
-        return err
-    }
-    err = exec.Command("go", "get", "-d").Run()
+    err := exec.Command("go", "get", "-d").Run()
     if err != nil {
         return err
     }
@@ -23,6 +21,7 @@ func setup() error {
     if err != nil {
         return err
     }
+    execString = "./"+cmdString
     return nil
 }
 
@@ -37,6 +36,10 @@ func teardown() {
 func TestMain(m *testing.M) {
     err := setup()
 
+    if err != nil {
+        fmt.Print(err.Error())
+    }
+
     if err == nil {
         m.Run()
     }
@@ -46,7 +49,7 @@ func TestMain(m *testing.M) {
 
 // Test to ensure we get help output on blank command call
 func TestEmptySubcommand(t *testing.T) {
-    cmd := exec.Command(cmdString)
+    cmd := exec.Command(execString)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
         log.Fatal(err)

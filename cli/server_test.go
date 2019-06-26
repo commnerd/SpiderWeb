@@ -8,7 +8,7 @@ import (
 )
 
 func TestServer(t *testing.T) {
-    cmd := exec.Command(cmdString, "server")
+    cmd := exec.Command(execString, "server")
     serverHelp := fmt.Sprintf(ServerHelp, cmdString)
     out := tools.GetCmdStdOut(cmd)
     if out != serverHelp {

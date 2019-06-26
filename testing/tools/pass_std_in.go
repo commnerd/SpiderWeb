@@ -6,8 +6,8 @@ import (
     "os"
 )
 
-// SetFunctionStdIn : Pass Stdout to Stdin
-func SetFunctionStdIn(f func()) string {
+// PassStdIn : Pass Stdout to Stdin
+func PassStdIn(f func()) string {
     old := os.Stdin // keep backup of the real stdin
     r, w, _ := os.Pipe()
     os.Stdin = w

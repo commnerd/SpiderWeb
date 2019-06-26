@@ -5,7 +5,6 @@ import (
     "strings"
     "syscall"
     "bufio"
-    "flag"
     "log"
     "fmt"
     "os"
@@ -26,13 +25,18 @@ Authenticate to the network
 
 // LoginCommand : Login subcommand
 func (c cli) LoginCommand() {
-    showHelp := flag.Bool("-help", false, "Show help message.")
-    flag.NewFlagSet("login", flag.ExitOnError)
-    flag.Parse()
-    if *showHelp {
+    showHelp := false
+    for _, val := range os.Args[1:] {
+        if val == "--help" || val == "-help" {
+            showHelp = true
+        }
+    }
+
+    if showHelp {
         fmt.Printf(LoginHelp, cmdString)
         os.Exit(0)
     }
+
     fmt.Print(EmailPrompt)
     reader := bufio.NewReader(os.Stdin)
     text, err := reader.ReadString('\n')

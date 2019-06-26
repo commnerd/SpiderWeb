@@ -8,7 +8,7 @@ import (
 )
 
 func TestVolumes(t *testing.T) {
-    cmd := exec.Command(cmdString, "volumes")
+    cmd := exec.Command(execString, "volumes")
     volumesHelp := fmt.Sprintf(VolumesHelp, cmdString)
     out := tools.GetCmdStdOut(cmd)
     if out != volumesHelp {
