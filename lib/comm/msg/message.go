@@ -1,7 +1,8 @@
 package msg
 
-type MessageType int
+import "github.com/google/uuid"
 
 type Message struct{
+	Id uuid.UUID
 	Body interface{}
 }
