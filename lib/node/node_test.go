@@ -10,12 +10,9 @@ import (
 
 var parent *Node
 
-var mockRunCalled bool
-
 func TestMain(m *testing.M) {
 	parent = New(nil)
 	parent.Id = uuid.MustParse("322a1963-2b7f-43d4-b9cf-2fcea27c63da")
-	mockRunCalled = false
     code := m.Run()
     os.Exit(code)
 }
@@ -54,17 +51,4 @@ func TestAddChild(t *testing.T) {
 	assert.Equal(t, ids.Mask(2), child.Mask)
 	assert.Equal(t, "32", string(child.Id.String()[0:child.Mask]))
 	assert.Equal(t, child, parent.Children[child.Id.String()])
-}
-
-func TestRun(t *testing.T) {
-	svc := MockService{}
-	parent.Execute(svc)
-
-	assert.True(t, mockRunCalled)
-}
-
-type MockService struct{}
-
-func (service MockService) Run() {
-	mockRunCalled = true
 }

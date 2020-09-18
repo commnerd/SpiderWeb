@@ -10,14 +10,15 @@ type Server interface{
 	Serve()
 }
 
-type server struct{}
+type server struct{
+	MsgHandler Receiver
+}
 
 func New() Server {
 	return &server{}
 }
 
 func triage(w http.ResponseWriter, req *http.Request) {
-
 }
 
 func (svr *server) Serve() {

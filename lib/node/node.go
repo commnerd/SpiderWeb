@@ -29,8 +29,8 @@ func New(parent *Node) *Node {
 		Mask: mask,
 		Parent: parent,
 		Children: make(map[string]*Node),
-		ServiceManager: service.NewManager(),
 	}
+	node.ServiceManager = service.NewManager(node)
 
 	return node
 }
@@ -42,8 +42,12 @@ func (parent *Node) AddChild(node *Node) {
 	parent.Children[node.Id.String()] = node
 }
 
-func (parent *Node) Execute(svc service.Service) {
-	svc.Run()
+func (node *Node) GetId() uuid.UUID {
+	return node.Id
+}
+
+func (node *Node) GetMask() ids.Mask {
+	return node.Mask
 }
 
 func getNextMask(mask ids.Mask) ids.Mask {
