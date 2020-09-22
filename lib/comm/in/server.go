@@ -2,8 +2,6 @@ package in
 
 import (
 	"net/http"
-	// "../msg"
-	// "fmt"
 )
 
 type Server interface{
@@ -14,7 +12,7 @@ type server struct{
 	MsgHandler Receiver
 }
 
-func New() Server {
+func NewServer() Server {
 	return &server{}
 }
 

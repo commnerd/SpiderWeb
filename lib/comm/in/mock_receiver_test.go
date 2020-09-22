@@ -7,6 +7,6 @@ import (
 	// "os"
 )
 
-func TestReceiverNew(t *testing.T) {
+func TestReceiverMock(t *testing.T) {
 	assert.True(t, true);
 }
