@@ -1,6 +1,7 @@
 package comm
 
 import (
+	"../node"
 	"./msg"
 	"./out"
 	"./in"
@@ -12,12 +13,15 @@ type Bus interface{
 }
 
 type bus struct{
+	Node node.Node
 	Receiver in.Receiver
 	Sender out.Sender
 }
 
-func NewBus() Bus {
-	b := &bus{}
+func NewBus(n node.Node) Bus {
+	b := &bus{
+		Node: n
+	}
 	b.Receiver = in.NewReceiver(b)
 	b.Sender = out.NewSender(b)
 
