@@ -8,7 +8,11 @@ docker run -v ~/.go:/go -v ${DIR}/..:/go/src/github.com/commnerd/SpiderWeb -v ${
 docker run -v ~/.go:/go -v ${DIR}/..:/go/src/github.com/commnerd/SpiderWeb -v ${DIR}/..:/workspace -it --rm --name sw-SpiderWeb-lib-tester golang bash -c "go get github.com/spf13/viper"
 docker run -v ~/.go:/go -v ${DIR}/..:/go/src/github.com/commnerd/SpiderWeb -v ${DIR}/..:/workspace -it --rm --name sw-SpiderWeb-lib-tester golang bash -c "go get github.com/google/uuid"
 # docker run -v ~/.go:/go -v ${DIR}/..:/go/src/github.com/commnerd/SpiderWeb -v ${DIR}/..:/workspace -w /workspace/lib/node -it --rm --name sw-SpiderWeb-lib-tester golang bash -c "go get -d && go test"
+
+
+
 docker run -v ~/.go:/go -v ${DIR}/..:/go/src/github.com/commnerd/SpiderWeb -v ${DIR}/..:/workspace -w /workspace/lib/message_bus -it --rm --name sw-SpiderWeb-lib-tester golang bash -c "go get -d && go test"
 docker run -v ~/.go:/go -v ${DIR}/..:/go/src/github.com/commnerd/SpiderWeb -v ${DIR}/..:/workspace -w /workspace/lib/config -it --rm --name sw-SpiderWeb-lib-tester golang bash -c "go get -d && go test"
 docker run -v ~/.go:/go -v ${DIR}/..:/go/src/github.com/commnerd/SpiderWeb -v ${DIR}/..:/workspace -w /workspace/lib/id -it --rm --name sw-SpiderWeb-lib-tester golang bash -c "go get -d && go test"
 docker run -v ~/.go:/go -v ${DIR}/..:/go/src/github.com/commnerd/SpiderWeb -v ${DIR}/..:/workspace -w /workspace/lib/services -it --rm --name sw-SpiderWeb-lib-tester golang bash -c "go get -d && go test"
+docker run -v ~/.go:/go -v ${DIR}/..:/go/src/github.com/commnerd/SpiderWeb -v ${DIR}/..:/workspace -w /workspace/lib/keys -it --rm --name sw-SpiderWeb-lib-tester golang bash -c "go get -d && go test"
