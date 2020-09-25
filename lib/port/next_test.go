@@ -43,6 +43,6 @@ func TestNextTen(t *testing.T) {
 		}
 	}()
 
-	assert.Equal(t, MIN + len(ports), Next())
+	assert.Equal(t, Port(int(MIN) + len(ports)), Next())
 	done <- true
 }

@@ -32,8 +32,8 @@ var GetString = viper.GetString // func GetString(key string) string
 // func GetStringMapStringSlice(key string) map[string][]string
 // func GetStringSlice(key string) []string
 // func GetTime(key string) time.Time
-// func InConfig(key string) bool
-// func IsSet(key string) bool
+var InConfig = viper.InConfig // func InConfig(key string) bool
+var IsSet = viper.IsSet // func IsSet(key string) bool
 // func MergeConfig(in io.Reader) error
 // func MergeInConfig() error
 // func OnConfigChange(run func(in fsnotify.Event))
@@ -42,7 +42,7 @@ var GetString = viper.GetString // func GetString(key string) string
 // func ReadRemoteConfig() error
 // func RegisterAlias(alias string, key string)
 // func Reset()
-// func Set(key string, value interface{})
+var Set = viper.Set // func Set(key string, value interface{})
 // func SetConfigFile(in string)
 // func SetConfigName(in string)
 // func SetConfigType(in string)

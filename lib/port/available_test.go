@@ -25,8 +25,8 @@ func TestUnavailable(t *testing.T) {
 	closePort(server)
 }
 
-func openPort(port int) *http.Server {
-	server := &http.Server{Addr: ":" + strconv.Itoa(port)}
+func openPort(port Port) *http.Server {
+	server := &http.Server{Addr: ":" + strconv.Itoa(int(port))}
 	go server.ListenAndServe()
 	time.Sleep(time.Millisecond)
 	return server
@@ -37,7 +37,7 @@ func closePort(server *http.Server) {
 	time.Sleep(time.Millisecond)
 }
 
-func waitForPort(port int) {
+func waitForPort(port Port) {
 	for !Available(port) {
 		time.Sleep(time.Millisecond)
 	}
