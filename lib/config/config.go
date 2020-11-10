@@ -42,7 +42,7 @@ var GetString = viper.GetString // func GetString(key string) string
 // func ReadRemoteConfig() error
 // func RegisterAlias(alias string, key string)
 // func Reset()
-// func Set(key string, value interface{})
+var Set = viper.Set // func Set(key string, value interface{})
 // func SetConfigFile(in string)
 // func SetConfigName(in string)
 // func SetConfigType(in string)
@@ -135,3 +135,7 @@ var GetConfig = viper.GetViper // func GetViper() *Viper
 // func (v *Viper) UnmarshalKey(key string, rawVal interface{}) error
 // func (v *Viper) WatchConfig()
 // func (v *Viper) WatchRemoteConfig() error
+
+func init() {
+	SetDefault("project_version", "0.0.0")
+}
