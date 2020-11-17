@@ -6,4 +6,5 @@ import (
 
 var Routes = map[string]func(w http.ResponseWriter, r *http.Request){
 	"/": HomeHandler,
+	"/register": RegisterHandler,
 }
