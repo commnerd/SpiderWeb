@@ -5,7 +5,9 @@ import (
 	"net/http"
 )
 
-func serve() {
+var RunningNode node
+
+func Serve() {
 	r := mux.NewRouter()
 
 	for path, handler := range(Routes) {

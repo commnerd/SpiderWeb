@@ -17,9 +17,8 @@ func init() {
 	config.SetDefault("rsa_bit_size", 4096)
 }
 
-func Generate() {
-	savePublicFileTo := config.GetString("id_rsa_pub_path")
-	savePrivateFileTo := config.GetString("id_rsa_path")
+func Generate() (privateKeyString, publicKey string) {
+
 	bitSize := config.GetInt("rsa_bit_size")
 
 	privateKey, err := generatePrivateKey(bitSize)
@@ -34,12 +33,22 @@ func Generate() {
 
 	privateKeyBytes := encodePrivateKeyToPEM(privateKey)
 
-	err = writeKeyToFile(privateKeyBytes, savePrivateFileTo)
+	privateKeyString = string(privateKeyBytes)
+	publicKey = string(publicKeyBytes)
+
+	return privateKeyString, publicKey
+}
+
+func WriteToFile(privateKey, publicKey string) {
+	savePublicFileTo := config.GetString("id_rsa_pub_path")
+	savePrivateFileTo := config.GetString("id_rsa_path")
+
+	err := writeKeyToFile([]byte(privateKey), savePrivateFileTo)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 
-	err = writeKeyToFile([]byte(publicKeyBytes), savePublicFileTo)
+	err = writeKeyToFile([]byte(publicKey), savePublicFileTo)
 	if err != nil {
 		log.Fatal(err.Error())
 	}

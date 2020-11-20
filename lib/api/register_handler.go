@@ -1,7 +1,8 @@
 package api
 
 import (
-	_ "encoding/json"
+	"encoding/json"
+	"io/ioutil"
 	"net/http"
 	"strconv"
 	"fmt"
@@ -21,18 +22,25 @@ const (
 	Failed
 )
 
+var response RegisterResponse
+
 type RegisterRequest struct{
 	Id string `json:"id"`
-	Type string `json:"type"`
+}
+
+func (rr RegisterRequest) RegisterChild(child node) (*RegisterResponse, error) {
+	return nil, nil
 }
 
 type RegisterResponse struct{
 	Status ResponseType `json:"status"`
-	AdjustedId string	`json:"adjusted_id"`
+	Version string      `json:"version"`
+	AdjustedId string   `json:"address"`
 	Mask id.Mask        `json:"mask"`
+	Ip string           `json:"ip"`
+	Port int            `json:"port"`
+	PublicRsa string    `json:"pub_rsa"`
 }
-
-var RegisterStruct *RegisterResponse
 
 func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
@@ -40,8 +48,6 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		RegisterOptions(w, r)
 	case http.MethodPost:
 		RegisterPost(w, r)
-	case http.MethodPut:
-		RegisterPut(w, r)
 	default:
 		code := http.StatusMethodNotAllowed
 		w.WriteHeader(code)
@@ -53,15 +59,34 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func RegisterOptions(w http.ResponseWriter, r *http.Request) {
-	for _, val := range []string{http.MethodOptions, http.MethodPost, http.MethodPut} {
+	for _, val := range []string{http.MethodOptions, http.MethodPost} {
 		w.Header().Add("Access-Control-Allow-Methods", val)
 	}
 }
 
 func RegisterPost(w http.ResponseWriter, r *http.Request) {
 
-}
+	body, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
+	if err != nil {
+		panic(err.Error())
+	}
 
-func RegisterPut(w http.ResponseWriter, r *http.Request) {
+	registrantNode := RegisterRequest{}
+	_ = json.Unmarshal(body, &registrantNode)
+	if err != nil {
+		panic(err.Error())
+	}
 
+	resp, err := RunningNode.RegisterChild(string(body))
+	if err != nil {
+		panic(err.Error())
+	}
+
+	respString, err := json.Marshal(resp)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	fmt.Fprintf(w, "%s", respString)
 }

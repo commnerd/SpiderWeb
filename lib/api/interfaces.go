@@ -1,5 +1,5 @@
 package api
 
 type node interface{
-	GetType() int
+	RegisterChild(child interface{}) (interface{}, error)
 }

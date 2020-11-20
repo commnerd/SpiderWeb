@@ -2,19 +2,10 @@ package api
 
 import (
 	"github.com/stretchr/testify/assert"
-	"github.com/google/uuid"
 	"net/http/httptest"
 	"net/http"
 	"testing"
-	"../id"
 )
-
-func TestMain(m *testing.M) {
-	HomeStruct.Address = id.Id(uuid.MustParse("322a1963-2b7f-43d4-b9cf-2fcea27c63da")).String()
-	HomeStruct.Ip = "192.168.10.10"
-	HomeStruct.Port = 42
-	m.Run()
-}
 
 func TestHomeHandler(t *testing.T) {
 	// Create a request to pass to our handler. We don't have any query parameters for now, so we'll
