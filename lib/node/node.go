@@ -1,15 +1,17 @@
 package node
 
 import (
+	"../keys"
 	"../id"
 )
 
 type Node struct{
-	Registrants map[id.Id]interface{}
-	Children map[id.Id]interface{}
+	Id id.Id
+	Mask id.Mask
+	Ip string
 	ChildCount uint64
-}
-
-func RegisterChild(node Node) bool {
-	return true
+	SshPort int
+	SshKeys keys.Keys
+	registrants map[id.Id]interface{}
+	children map[id.Id]interface{}
 }

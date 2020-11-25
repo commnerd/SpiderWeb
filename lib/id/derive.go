@@ -2,10 +2,17 @@ package id
 
 import (
 	"github.com/google/uuid"
+	"errors"
 	"../util"
 )
 
-func Derive(parentId Id, mask Mask) Id {
+var hexMap []byte = []byte("0123456789abcdef")
+
+func Derive(parentId Id, mask Mask) (Id, error) {
+	if len(hexMap) == 0 {
+		return parentId, errors.New("No more chars available.")
+	}
+
 	mask++
 
 	exists, _ := util.InArray(mask, BadMasks)
@@ -14,5 +21,11 @@ func Derive(parentId Id, mask Mask) Id {
 		mask++
 	}
 
-	return Id(uuid.MustParse(string(parentId.String()[0:mask+1] + uuid.UUID(New()).String()[mask+1:36])))
+	parentIdString := []byte(parentId.String())
+
+	parentIdString[mask] = hexMap[0]
+
+	hexMap = hexMap[1:]
+
+	return Id(uuid.MustParse(string(parentIdString))), nil
 }

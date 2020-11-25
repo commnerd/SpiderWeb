@@ -35,11 +35,11 @@ func (rr RegisterRequest) RegisterChild(child node) (*RegisterResponse, error) {
 type RegisterResponse struct{
 	Status ResponseType `json:"status"`
 	Version string      `json:"version"`
-	AdjustedId string   `json:"address"`
-	Mask id.Mask        `json:"mask"`
+	AdjustedId string   `json:"address,omitempty"`
+	Mask id.Mask        `json:"mask,omitempty"`
 	Ip string           `json:"ip"`
 	Port int            `json:"port"`
-	PublicRsa string    `json:"pub_rsa"`
+	PublicRsa string    `json:"pub_rsa,omitempty"`
 }
 
 func RegisterHandler(w http.ResponseWriter, r *http.Request) {
