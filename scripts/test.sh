@@ -10,14 +10,15 @@ docker run -v ~/.go:/go -v ${DIR}/..:/go/src/github.com/commnerd/SpiderWeb -v ${
 docker run -v ~/.go:/go -v ${DIR}/..:/go/src/github.com/commnerd/SpiderWeb -v ${DIR}/..:/workspace -it --rm --name sw-SpiderWeb-lib-tester golang bash -c "go get github.com/google/uuid"
 
 libs=(
-	"node"
-	"message_bus"
-	"config"
-	"id"
-	"services"
-	"keys"
-	"port"
-	"api"
+	# "node"
+	# "message_bus"
+	# "config"
+	# "id"
+	# "services"
+	# "keys"
+	# "port"
+	# "api"
+    "db"
 )
 
 for l in ${libs[@]}; do
