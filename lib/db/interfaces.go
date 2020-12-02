@@ -1,6 +1,9 @@
 package db
 
-type node interface{
-	GetIp()
+import (
+	"../id"
+)
 
+type node interface{
+	GetId() id.Id
 }

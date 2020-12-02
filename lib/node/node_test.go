@@ -3,8 +3,10 @@ package node
 import (
 	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"../config"
 )
 
-func TestTrue(t *testing.T) {
-	assert.True(t, true)
+func TestConfigSetting(t *testing.T) {
+	assert.True(t, config.Get("NODE") != nil)
 }

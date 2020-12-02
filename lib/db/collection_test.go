@@ -6,16 +6,34 @@ import (
 	"fmt"
 )
 
-func TestInstanceAddCollection(t *testing.T) {
+func TestCollectionNotExists(t *testing.T) {
+	db := New();
+	exists := db.CollectionExists("foo")
+	assert.True(t, !exists)
+}
+
+func TestCollectionExists(t *testing.T) {
+	db := New();
+	db.Collections["foo"] = &Collection{}
+	exists := db.CollectionExists("foo")
+	assert.True(t, exists)
+}
+
+func TestAddCollection(t *testing.T) {
 	db := New();
 	err := db.AddCollection("foo")
 	assert.True(t, err == nil)
 	assert.IsType(t, &Collection{}, db.Collections["foo"])
+
+	// cleanup
+	instance = New()
 }
 
-func TestAddCollection(t *testing.T) {
+func TestInstanceAddCollection(t *testing.T) {
 	AddCollection("foo")
 	assert.IsType(t, &Collection{}, instance.Collections["foo"])
+
+	// cleanup
 	instance = New()
 }
 
@@ -28,4 +46,16 @@ func TestFailureOnRepeatCollection(t *testing.T) {
 	err = db.AddCollection("foo")
 	assert.True(t, err != nil)
 	assert.Equal(t, err.Error(), fmt.Sprintf(CollectionPresentError, "foo"))
+}
+
+func TestFailureOnInstanceRepeatCollection(t *testing.T) {
+	err := instance.AddCollection("foo")
+	assert.True(t, err == nil)
+
+	err = instance.AddCollection("foo")
+	assert.True(t, err != nil)
+	assert.Equal(t, err.Error(), fmt.Sprintf(CollectionPresentError, "foo"))
+
+	// cleanup
+	instance = New()
 }

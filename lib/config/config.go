@@ -19,7 +19,7 @@ var AddRemoteProvider = viper.AddRemoteProvider // func AddRemoteProvider(provid
 // func Debug()
 // func Desc(key string) (string, UseLevel, int)
 // func Filesys() afero.Fs
-// func Get(key string) interface{}
+var Get = viper.Get // func Get(key string) interface{}
 // func GetBool(key string) bool
 // func GetDuration(key string) time.Duration
 // func GetFloat64(key string) float64
@@ -33,7 +33,7 @@ var GetString = viper.GetString // func GetString(key string) string
 // func GetStringSlice(key string) []string
 // func GetTime(key string) time.Time
 // func InConfig(key string) bool
-// func IsSet(key string) bool
+var IsSet = viper.IsSet // func IsSet(key string) bool
 // func MergeConfig(in io.Reader) error
 // func MergeInConfig() error
 // func OnConfigChange(run func(in fsnotify.Event))

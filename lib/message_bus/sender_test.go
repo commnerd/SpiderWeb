@@ -6,15 +6,15 @@ import (
 )
 
 type mockSender struct{
-	fail bool
+	success bool
 }
 
 func (r *mockSender) GetLabel() string {
 	return "Test Label"
 }
 
-func (r *mockSender) Send(msg interface{}) bool {
-	return r.fail
+func (r *mockSender) Send(msg interface{}) interface{} {
+	return r.success
 }
 
 func TestSenderLabel(t *testing.T) {
@@ -24,16 +24,20 @@ func TestSenderLabel(t *testing.T) {
 
 func TestSenderFailSend(t *testing.T) {
 	s := &mockSender{
-		fail: false,
+		success: false,
 	}
 
-	assert.True(t, !s.Send("foo"))
+	sent, ok := s.Send("foo").(bool)
+	assert.True(t, ok)
+	assert.True(t, !sent)
 }
 
 func TestSenderSuccessfulSend(t *testing.T) {
 	s := &mockSender{
-		fail: true,
+		success: true,
 	}
 
-	assert.True(t, s.Send("bar"))
+	sent, ok := s.Send("foo").(bool)
+	assert.True(t, ok)
+	assert.True(t, sent)
 }

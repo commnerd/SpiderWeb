@@ -5,13 +5,15 @@ import (
 )
 
 func (db *DB) UsesParody() bool {
-	return true
+	return db.ParodySpan() > 1
 }
 
 func (db *DB) ParodySpan() int {
-	return config.GetInt("parody_span")
+	return config.GetInt("db_parody_span")
 }
 
 func (db *DB) TriggerParodyRedistrobution() {
-
+	for _, collection := range db.Collections {
+		collection.Redistribute()
+	}
 }

@@ -17,7 +17,7 @@ func (sr *sendReceive) GetLabel() string {
 	return "Sender/Receiver"
 }
 
-func (sr *sendReceive) Send(msg interface{}) bool {
+func (sr *sendReceive) Send(msg interface{}) interface{} {
 	return sr.sent
 }
 
