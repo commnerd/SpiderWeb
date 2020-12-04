@@ -3,7 +3,6 @@ package db
 import(
 	"sort"
 
-	"../message_bus"
 	"../config"
 	"../id"
 )
@@ -50,5 +49,4 @@ func init() {
 	config.SetDefault("db_parody_span", 10)
 	instance = New()
 	config.Set("DB", instance)
-	message_bus.Register(instance)
 }

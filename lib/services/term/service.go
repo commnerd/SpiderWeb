@@ -1,7 +1,6 @@
 package term
 
 import (
-	"../../message_bus"
 	"os/exec"
 )
 
@@ -19,8 +18,6 @@ func init() {
 	}
 
 	s.Listen()
-
-	message_bus.Register(s)
 }
 
 func Get() *service {
