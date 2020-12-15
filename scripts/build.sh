@@ -9,7 +9,7 @@ case $ENV in
     *) ENV="test" ;;
 esac
 
-sudo rm -fR $DIR/bin/*
+# sudo rm -fR $DIR/bin/*
 
 docker run -v ${DIR}:/workspace -e -it --rm --name sw-SpiderWeb-ui-builder node bash -c "cd /workspace/frontend && yarn && yarn build"
 
