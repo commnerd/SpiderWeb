@@ -18,7 +18,7 @@ libs=(
 	"keys"
 	"port"
 	"api"
-    "db"
+  "db"
 )
 
 for l in ${libs[@]}; do

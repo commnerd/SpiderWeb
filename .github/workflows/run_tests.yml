@@ -1,0 +1,37 @@
+name: Run Tests
+
+on:
+  pull_request:
+    branches: ['v0.3.x']
+  push:
+    branches: ['v0.3.0/test_workflow']
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Project
+        uses: actions/checkout@v2
+      - name: Setup Docker
+        uses: docker-practice/actions-setup-docker@1.0.4
+      - name: Run tests
+        run: |
+          mkdir ~/.go
+          docker run -v ~/.go:/go -v ${PWD}:/go/src/github.com/commnerd/SpiderWeb -v ${PWD}:/workspace -i --rm --name sw-SpiderWeb-lib-tester golang bash -c "go get github.com/stretchr/testify/assert"
+          docker run -v ~/.go:/go -v ${PWD}:/go/src/github.com/commnerd/SpiderWeb -v ${PWD}:/workspace -i --rm --name sw-SpiderWeb-lib-tester golang bash -c "go get github.com/spf13/viper"
+          docker run -v ~/.go:/go -v ${PWD}:/go/src/github.com/commnerd/SpiderWeb -v ${PWD}:/workspace -i --rm --name sw-SpiderWeb-lib-tester golang bash -c "go get github.com/google/uuid"
+          libs=(
+          "node"
+          "message_bus"
+          "config"
+          "id"
+          "services"
+          "keys"
+          "port"
+          "api"
+          "db"
+          )
+          for l in ${libs[@]}; do
+          docker run -v ~/.go:/go -v ${PWD}:/go/src/github.com/commnerd/SpiderWeb -v ${PWD}:/workspace -w /workspace/lib/$l -i --rm --name sw-SpiderWeb-lib-tester golang bash -c "go get -d && go test"
+          done
