@@ -18,7 +18,8 @@ libs=(
 	"keys"
 	"port"
 	"api"
-    "db"
+	"db"
+	"reverse_tunnel"
 )
 
 for l in ${libs[@]}; do
