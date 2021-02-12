@@ -1,5 +1,8 @@
 FROM ubuntu
 
+ENV TUNNEL_PORT 12345
+ENV USER ubuntu
+
 RUN apt-get update && apt-get install -y \
     software-properties-common \
     apt-transport-https \
@@ -21,6 +24,8 @@ RUN curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add 
     apt-mark hold kubelet kubeadm kubectl
 
 RUN mkdir -p /var/lib/kubelet
+
+RUN mkdir -p /var/run/spiderweb
 
 COPY entrypoint.sh /entrypoint.sh
 
