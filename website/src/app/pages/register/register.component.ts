@@ -2,17 +2,17 @@ import { FormControl, FormGroup } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'app-login',
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+  selector: 'app-register',
+  templateUrl: './register.component.html',
+  styleUrls: ['./register.component.scss']
 })
-export class LoginComponent implements OnInit {
+export class RegisterComponent implements OnInit {
 
-  loginForm: FormGroup = new FormGroup({
+  registerForm : FormGroup = new FormGroup({
     'email': new FormControl(""),
     'password': new FormControl(""),
   });
-
+  
   constructor() { }
 
   ngOnInit(): void {

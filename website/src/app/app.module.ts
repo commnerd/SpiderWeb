@@ -11,6 +11,8 @@ import { HomeComponent } from './layouts/home/home.component';
 import { LoginComponent } from './pages/login/login.component';
 import { StandardComponent } from './layouts/standard/standard.component';
 import { LinkComponent } from './partials/link/link.component';
+import { RegisterComponent } from './pages/register/register.component';
+import { RetrievePasswordComponent } from './pages/retrieve-password/retrieve-password.component';
 
 @NgModule({
   declarations: [
@@ -22,6 +24,8 @@ import { LinkComponent } from './partials/link/link.component';
     HomeComponent,
     LoginComponent,
     StandardComponent,
+    RegisterComponent,
+    RetrievePasswordComponent,
   ],
   imports: [
     BrowserModule,

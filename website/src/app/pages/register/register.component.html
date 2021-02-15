@@ -1,6 +1,6 @@
 <layout-standard>
-    <h1>Login</h1>
-    <form [formGroup]="loginForm">
+    <h1>Register</h1>
+    <form [formGroup]="registerForm">
         <div class="form-group">
           <label for="email">Email address</label>
           <input type="email" class="form-control" id="email" formControlName="email" aria-describedby="emailHelp" placeholder="Enter email">
@@ -9,9 +9,6 @@
         <div class="form-group">
           <label for="password">Password</label>
           <input type="password" class="form-control" id="password" formControlName="password" placeholder="Password">
-        </div>
-        <div class="col-12 help">
-          If you've forgotten your password, please click <a [routerLink]="['/retrieve-password']">here</a> to retrieve it.
         </div>
         <button type="submit" class="btn btn-primary">Submit</button>
       </form>
