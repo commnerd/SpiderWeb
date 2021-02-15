@@ -1,0 +1,10 @@
+<a
+    #rla="routerLinkActive"
+    class="nav-link"
+    [routerLink]="route"
+    routerLinkActive="active"
+    [routerLinkActiveOptions]="{ exact: true }"
+>
+  <ng-content></ng-content>
+  <span *ngIf="rla.isActive" class="sr-only">(current)</span>
+</a>

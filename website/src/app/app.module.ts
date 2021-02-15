@@ -7,14 +7,20 @@ import { AppComponent } from './app.component';
 import { NotFoundComponent } from './pages/not-found/not-found.component';
 import { NavBarComponent } from './partials/nav-bar/nav-bar.component';
 import { HomeComponent } from './layouts/home/home.component';
+import { LoginComponent } from './pages/login/login.component';
+import { StandardComponent } from './layouts/standard/standard.component';
+import { LinkComponent } from './partials/link/link.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     HomePageComponent,
     NotFoundComponent,
+    LinkComponent,
     NavBarComponent,
-    HomeComponent
+    HomeComponent,
+    LoginComponent,
+    StandardComponent,
   ],
   imports: [
     BrowserModule,
