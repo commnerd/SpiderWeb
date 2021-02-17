@@ -30,12 +30,5 @@ curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - &&
     apt-get install -y kubelet kubeadm kubectl && \
     apt-mark hold kubelet kubeadm kubectl
 
-kubeadm init --control-plane-endpoint spiderweb.com
-
-# Join a new control plane node
 #kubeadm join spiderweb.com:6443 --token <token> \
-#    --discovery-token-ca-cert-hash sha256:<SHA256> \
-#    --control-plane
-
-# Allow controle plane to run pods
-kubectl taint nodes --all node-role.kubernetes.io/master-
+#    --discovery-token-ca-cert-hash sha256:<SHA256>
